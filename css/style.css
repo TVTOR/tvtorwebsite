@@ -1,0 +1,324 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Caveat+Brush&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;0,700;0,900;1,400;1,700;1,900&display=swap');
+
+body {
+    font-family: 'Lato', sans-serif;
+    font-style: italic;
+    letter-spacing: 1px;
+}
+
+h1 {
+    font-size: 3.5em;
+    letter-spacing: 1px;
+    margin: 0 0 30px 0;
+}
+
+.section {
+    margin: 40px 0;
+}
+
+/********* NAVBAR *********/ 
+.navbar {
+    font-family: 'Caveat Brush', cursive;
+    font-style: normal;
+    margin-top: 20px;
+    border-radius: 25px;
+    z-index: 100;
+    -webkit-box-shadow: 1px 11px 29px -12px rgba(0,0,0,0.75);
+    -moz-box-shadow: 1px 11px 29px -12px rgba(0,0,0,0.75);
+    box-shadow: 1px 11px 29px -12px rgba(0,0,0,0.75);
+}
+
+#navabar_logo img{
+    max-width: 150px;
+    min-width: 45px;
+    width: 50%;
+}
+
+.navbar .nav-link {
+    font-size: 1.4em;
+    letter-spacing: 1px;
+}
+
+.richiedi_tutor {
+    background: linear-gradient(90deg, rgba(54,161,221,1) 0%, rgba(12,62,173,0.7799663597733711) 100%);
+    border-radius: 25px;
+    padding: 0.6em 3em;
+    font-size: 1.4em;
+    color: #fff !important;
+}
+
+.navbar-right {
+    justify-content: flex-end!important;
+}
+
+/********* HEADER, VIDEO *********/ 
+
+header {
+    font-family: 'Caveat Brush', cursive;
+    font-style: normal;
+    position: relative;
+    background-color: black;
+    height: 100vh;
+    min-height: 25rem;
+    width: 100%;
+    overflow: hidden;
+}
+
+header video {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    z-index: 0;
+    -ms-transform: translateX(-50%) translateY(-50%);
+    -moz-transform: translateX(-50%) translateY(-50%);
+    -webkit-transform: translateX(-50%) translateY(-50%);
+    transform: translateX(-50%) translateY(-50%);
+}
+
+header .container {
+    position: relative;
+    z-index: 2;
+}
+
+header .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background-color: black;
+    opacity: 0.5;
+    z-index: 1;
+}
+
+.slogan {
+    font-family: 'Caveat Brush', cursive;
+    margin: 0 10%;
+    line-height: 70px;
+}
+
+/*.city1 {
+color: #fff;
+background: linear-gradient(90deg, rgba(54,161,221,1) 0%, rgba(12,62,173,0.7799663597733711) 100%);
+border-radius: 50px;
+padding: 5px 10px;
+}
+
+.city2 {
+color: #fff;
+background: linear-gradient(90deg, rgba(54,161,221,1) 0%, rgba(12,62,173,0.7799663597733711) 100%);
+border-radius: 50px;
+padding: 5px 10px;
+} */
+
+@media (pointer: coarse) and (hover: none) {
+    header {
+        background: url('../images/video_verona_torino.mp4') black no-repeat center scroll;
+    }
+    header video {
+        display: none;
+    }
+}
+
+/********* HOW TO *********/
+#how-to {
+    font-weight: 700;
+}
+
+#how-to .badge {
+    padding: 0.8em 1em;
+    background: linear-gradient(90deg, rgba(54,161,221,1) 0%, rgba(12,62,173,0.7799663597733711) 100%);
+    color: #fff;
+    border-radius: 50%;
+
+}
+
+#how-to .cards p{
+    color: #666;
+}
+
+#how-to img {
+    margin: 30px 0;
+}
+
+
+/******** CONTATTI *******/
+#contacts {
+    background: linear-gradient(90deg, rgba(54,161,221,1) 0%, rgba(12,62,173,0.7799663597733711) 100%);
+    color: #fff;
+    padding: 40px 0;
+}
+
+#contacts .info {
+    display: flex;
+    flex-direction: column;
+
+}
+
+#contacts .info span {
+    font-weight: 700;
+    font-size: 1.3em;
+}
+
+#contacts .info a {
+    font-weight: 300;
+    color: #fff;
+    font-size: 1em;
+}
+
+#contacts .social {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#contacts .social i{
+    font-size: 50px;
+    margin: 0 20px;
+    display: block;
+}
+
+form {
+    text-align: right!important;
+}
+
+#contacts form input {
+    border: 0;
+    padding: 30px;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 40px;
+}
+
+#contacts form textarea {
+    height: 90%;
+    padding: 20px 30px 0 30px;
+    border: 0;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 40px;
+}
+
+#contacts button {
+    font-size: 1rem;
+    padding: 10px 50px;
+    border: 4px solid #fff;
+    background-color: rgba(12,62,173,0);
+    border-radius: 20px;
+}
+
+/******** FOOTER ********/
+footer {
+    padding: 40px 0;
+    font-size: 22px;
+    font-family: 'Caveat Brush', cursive;
+    font-style: normal;
+}
+
+footer a {
+    color: #36a1dd;
+}
+
+footer a:hover {
+    text-decoration: none;
+    color: #4169bf;
+}
+
+
+/******* RESPONSIVE ******/
+
+.nav-item i {
+    display: none;
+    
+}
+@media screen and (max-width: 880px) {
+    .nav-item i {
+        display: inline-block;
+        font-size: 1.3em;
+    }
+    .nav-item span {
+        display: none;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .navbar {
+        margin-top: auto;
+        border-radius: 0;
+    }
+    .nav-item span {
+        display: inline-block;
+    }
+    .nav-item i {
+        display: none;
+    }
+    #how-to img {
+            margin: 0 auto;
+    }
+    .pas1, .pas2, .pas3 {
+        padding: 30px;
+        border-bottom: 1px solid #ccc;
+    }
+    #contacts .social {
+        margin: 30px 0;
+    }
+    .row {
+        flex-direction: column;
+    }
+    form {
+        text-align: center!important;
+    }
+}
+
+@media screen and (max-width: 700px) {
+    #navabar_logo img {
+        width: 60%;
+    }
+    .nav-item span {
+        display: none;
+    }
+    .nav-item i {
+        display: inline-block;
+    }
+}
+
+@media screen and (max-width: 640px) {
+    .nav-item i {
+        display: inline-block;
+        font-size: 1em;
+    }
+}
+
+@media screen and (max-width: 560px) {
+    .richiedi_tutor {
+        padding: 0.5em 1.7em;
+        border-radius: 22px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .richiedi_tutor {
+        padding: 0.2em 1em;
+        border-radius: 17px;
+        font-size: auto;
+    }
+    .nav-item i {
+        display: inline-block;
+        font-size: 0.8em;
+    }
+    .slogan {
+        font-size: 2.8em;
+        line-height: 50px;
+    }
+    footer {
+        padding: 20px 0;
+    }
+}
+
