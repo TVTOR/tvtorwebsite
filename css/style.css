@@ -83,21 +83,16 @@ header video {
     filter: blur(2px) brightness(0.7);
 }
 
+@media (max-width: 768px) {
+  header video { filter: blur(1px) brightness(0.8); }
+}
+
 header .container {
     position: relative;
     z-index: 2;
 }
 
-header .overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 100%;
-    background-color: black;
-    opacity: 0.5;
-    z-index: 1;
-}
+header .overlay { opacity: 0.2; }
 
 .slogan {
     font-family: 'Caveat Brush', cursive;
