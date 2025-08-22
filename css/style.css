@@ -80,7 +80,7 @@ header video {
     object-fit: cover;
 
     /* effetto blur + scurimento */
-    filter: blur(2px) brightness(0.7);
+    filter: blur(0px) brightness(0.7);
 }
 
 @media (max-width: 768px) {
