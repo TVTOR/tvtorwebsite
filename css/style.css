@@ -84,7 +84,7 @@ header video {
 }
 
 @media (max-width: 768px) {
-  header video { filter: blur(1px) brightness(0.8); }
+  header video { filter: blur(0px) brightness(0.7); }
 }
 
 header .container {
