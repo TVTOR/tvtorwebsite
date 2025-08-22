@@ -119,6 +119,30 @@ padding: 5px 10px;
   header video { display: block; }       /* mostra il video anche su mobile */
 }
 
+#chat-widget {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #0c3ead;
+  color: #fff;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  z-index: 9999;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+#chat-widget:hover {
+  background: #0940a8;
+}
+
+
 
 /********* HOW TO *********/
 #how-to {
