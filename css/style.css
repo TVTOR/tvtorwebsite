@@ -76,10 +76,11 @@ header video {
     width: auto;
     height: auto;
     z-index: 0;
-    -ms-transform: translateX(-50%) translateY(-50%);
-    -moz-transform: translateX(-50%) translateY(-50%);
-    -webkit-transform: translateX(-50%) translateY(-50%);
-    transform: translateX(-50%) translateY(-50%);
+    transform: translate(-50%, -50%);
+    object-fit: cover;
+
+    /* effetto blur + scurimento */
+    filter: blur(2px) brightness(0.7);
 }
 
 header .container {
