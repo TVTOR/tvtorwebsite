@@ -120,7 +120,8 @@ padding: 5px 10px;
 
 @media (pointer: coarse) and (hover: none) {
     header {
-        background: url('../images/video_verona_torino.mp4') black no-repeat center scroll;
+        background: url('../media/poster_video.png') black no-repeat center scroll;
+        background-size: cover;
     }
     header video {
         display: none;
@@ -159,30 +160,27 @@ padding: 5px 10px;
 #contacts .info {
     display: flex;
     flex-direction: column;
-
+    align-items: center;
+    margin-bottom: 30px;
 }
 
 #contacts .info span {
     font-weight: 700;
     font-size: 1.3em;
+    margin-bottom: 10px;
 }
 
 #contacts .info a {
     font-weight: 300;
     color: #fff;
     font-size: 1em;
+    margin-bottom: 15px;
+    text-decoration: none;
 }
 
-#contacts .social {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-#contacts .social i{
-    font-size: 50px;
-    margin: 0 20px;
-    display: block;
+#contacts .info a:hover {
+    color: #fff;
+    text-decoration: underline;
 }
 
 form {
@@ -212,6 +210,18 @@ form {
     border: 4px solid #fff;
     background-color: rgba(12,62,173,0);
     border-radius: 20px;
+    color: #fff;
+    transition: all 0.3s ease;
+}
+
+#contacts button:hover {
+    background-color: #fff;
+    color: #0c3ead;
+}
+
+#contacts button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 
 /******** FOOTER ********/
@@ -231,13 +241,16 @@ footer a:hover {
     color: #4169bf;
 }
 
+footer a[style*="pointer-events: none"] {
+    cursor: default;
+}
 
 /******* RESPONSIVE ******/
 
 .nav-item i {
     display: none;
-    
 }
+
 @media screen and (max-width: 880px) {
     .nav-item i {
         display: inline-block;
@@ -253,27 +266,41 @@ footer a:hover {
         margin-top: auto;
         border-radius: 0;
     }
+    
+    .navbar-nav {
+        flex-direction: row;
+        justify-content: center;
+        width: 100%;
+    }
+    
+    .nav-item {
+        margin: 0 15px;
+    }
+    
     .nav-item span {
         display: inline-block;
     }
     .nav-item i {
         display: none;
     }
+    
     #how-to img {
-            margin: 0 auto;
+        margin: 0 auto;
     }
     .pas1, .pas2, .pas3 {
         padding: 30px;
         border-bottom: 1px solid #ccc;
     }
-    #contacts .social {
-        margin: 30px 0;
-    }
+    
     .row {
         flex-direction: column;
     }
     form {
         text-align: center!important;
+    }
+    
+    #contacts .info {
+        margin-bottom: 20px;
     }
 }
 
@@ -293,6 +320,15 @@ footer a:hover {
     .nav-item i {
         display: inline-block;
         font-size: 1em;
+    }
+    
+    .navbar-nav {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .nav-item {
+        margin: 10px 0;
     }
 }
 
@@ -319,6 +355,17 @@ footer a:hover {
     }
     footer {
         padding: 20px 0;
+    }
+    
+    #contacts form input,
+    #contacts form textarea {
+        padding: 20px;
+        font-size: 0.9rem;
+    }
+    
+    #contacts button {
+        padding: 8px 30px;
+        font-size: 0.9rem;
     }
 }
 
