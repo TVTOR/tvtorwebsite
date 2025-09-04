@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<title>convForm - example</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1">
+	<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" href="css/jquery.convform.css">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+		integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+	<link rel="stylesheet" type="text/css" href="css/demo.css">
+	<style>
+		/* Style the language selector properly */
+		#languageChange {
+			position: absolute;
+			top: 10px;
+			left: 10px;
+			z-index: 1000;
+			padding: 5px 10px;
+			border: 1px solid #ddd;
+			border-radius: 5px;
+			background: white;
+			font-size: 12px;
+		}
+		
+		/* Fix message positioning to prevent overlap with options */
+		div.conv-form-wrapper div#messages div.message.to {
+			margin-bottom: 15px !important;
+		}
+		
+		/* Ensure proper spacing during animations */
+		div.conv-form-wrapper div.message {
+			animation: slideTopFixed 0.15s ease;
+		}
+		
+		@keyframes slideTopFixed {
+			0% {
+				opacity: 0;
+				transform: translateY(10px);
+			}
+			100% {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+		
+		/* Override the problematic slideTop animation */
+		@keyframes slideTop {
+			0% {
+				opacity: 0;
+				transform: translateY(10px);
+			}
+			100% {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+		
+		/* Ensure options have proper spacing from messages */
+		div.conv-form-wrapper div.options {
+			margin-top: 10px;
+		}
+		
+		/* Ensure no overflow CSS text appears */
+		body {
+			overflow-x: hidden;
+		}
+		
+		/* Clean up any debug content */
+		* {
+			line-height: normal;
+		}
+	</style>
+</head>
+
+<body>
+	<select name="" id="languageChange">
+		<option value="en">English</option>
+		<option value="it" selected>Italian</option>
+	</select>
+	<section id="demo">
+		<div class="vertical-align">
+			<div class="container">
+				<div class="row">
+					<div class="col-sm-6 col-sm-offset-3 col-xs-offset-0">
+						<div class="card no-border">
+							<div id="chat">
+								<form action="" id="form-chatbot" method="GET" class="hidden">
+									<select id="question-data-it"
+										data-conv-question="Ciao, benvenuto su TVTOR, posso aiutarti a trovare un tutor?"
+										name="first-question">
+										<option value="si">si</option>
+										<option value="certo">certo!</option>
+									</select>
+									<select id="question-data-en" style="display: none;"
+										data-conv-question="Hello! Welcome to Simon. May I help you?"
+										name="first-question">
+										<option value="yes">Yes</option>
+										<option value="sure">Sure!</option>
+									</select>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+	<script type="text/javascript" src="js/jquery-1.12.3.min.js"></script>
+	<script type="text/javascript" src="js/autosize.min.js"></script>
+	<script type="text/javascript" src="js/jquery.convform.js"></script>
+
+
+
+	<script>
+		$('#languageChange').on('change', function () {
+			if ($('#languageChange').val() == 'it') {
+				// Show Italian, hide English
+				$('#question-data-it').show();
+				$('#question-data-en').hide();
+	
+				$('.message:first-child').html('')
+				$('.message:first-child').html('Ciao, benvenuto su TVTOR, posso aiutarti a trovare un tutor?')
+				$("#convForm .option:first-child").html('si')
+				$("#convForm .option:nth-child(2)").html('certo')
+				$("#convForm .option:first-child").text('si')
+				$("#convForm .option:nth-child(2)").text('certo')
+
+				$("#convForm .option:first-child").val('si')
+				$("#convForm .option:nth-child(2)").val('certo')
+				if ($("#userInput").attr("placeholder") == "Select an option") {
+					$("#userInput").attr("placeholder", "seleziona un'opzione");
+				} else {
+					$("textarea#userInput").attr("placeholder", "digita qui");
+
+				}
+				$(".submit").html('invia');
+
+			} else {
+				// Show English, hide Italian
+				$('#question-data-en').show();
+				$('#question-data-it').hide();
+				
+				$('.message:first-child').html('')
+				$('.message:first-child').html('Hello! Welcome to Simon. May I help you?')
+				$("#convForm .option:first-child").html('Yes')
+				$("#convForm .option:nth-child(2)").html('Sure')
+				$(".option:first-child").html('Yes')
+				$(".option:nth-child(2)").html('Sure')
+				if ($("#userInput").attr("placeholder") == "Select an option") {
+					$("#userInput").attr("placeholder", "Select an option");
+				} else {
+					$("textarea#userInput").attr("placeholder", "Type here");
+
+				}
+				$(".submit").html('Send');
+			}
+		});
+		jQuery(function ($) {
+			const baseUrl = 'https://tvtorbackend.onrender.com/api/v1';
+			var userData = {};
+			var isAssignTutor = true;
+			var isAssignTutor_check = true;
+			var setIntervalTime;
+			var newQuestion = '';
+			var count = 2;
+			var lastNext = 0;
+			let notificationId = ""
+			var url = `${baseUrl}/question`
+			var convForm = $('#chat').convform({
+				selectInputStyle: 'disable', eventList: {
+					onInputSubmit: function (convState, ready) {
+						get_question(convState, ready);
+						if (convState.current.input.name != "name") {
+							$("#chat").addClass("danger");
+						}
+						if (convState.current.input.name == "name") {
+							$("#chat").removeClass("danger");
+
+						}
+						if (convState.current.input.name == "age") {
+							$("#chat").removeClass("danger");
+
+						}
+						if (userData.hasOwnProperty('subject') && userData.hasOwnProperty('location')) {
+							setIntervalTime = setInterval(() => {
+								if (isAssignTutor) {
+									checkTutorAssignOrNot(convState, ready);
+								}
+							}, 2000);
+							setTimeout(function () {
+								clearInterval(setIntervalTime);
+							}, 60000);
+						}
+					}
+				}
+			});
+
+			// Initialize Italian language by default
+			setTimeout(function() {
+				$('#languageChange').val('it').trigger('change');
+			}, 500);
+
+			function locationCheck() {
+				var checkLocationUrl = `${baseUrl}/getTutorsLocation`;
+				jQuery.ajax({
+					url: checkLocationUrl, async: true, method: 'post', data: userData, success: function (result) {
+						if (result.statusCode == 404) {
+							var que = "There is no tutor are available on this location";
+							$('#messages').append('<div class="message to ready">' + que + '</div>').animate({ scrollTop: $("#messages").offset().top + 600 }, 600);
+							return false;
+						} else {
+							return true;
+						}
+					}
+				})
+			}
+
+			function checkTutorAssignOrNot(convState, ready) {
+				var checkLocationUrl = `${baseUrl}/checkTutorAssignOrNot/${userData.email}`;
+				if (isAssignTutor) {
+					jQuery.ajax({
+						url: checkLocationUrl, async: true, method: 'get', data: userData, success: function (result) {
+							if (result.data && isAssignTutor && isAssignTutor_check) {
+								isAssignTutor_check = false
+								assignTutor(convState, ready);
+							}
+
+						}
+					})
+				}
+			}
+
+			function assignTutor(convState, ready) {
+				var assignTutorUrl = `${baseUrl}/getStudentTutor`;
+				jQuery.ajax({
+					url: assignTutorUrl, async: true, method: 'post', data: userData, success: function (result) {
+						isAssignTutor = false;
+						clearInterval(setIntervalTime);
+						var que
+						if ($('#languageChange').val() == 'en') {
+							que = "There is no tutor available right now. Thank you!";
+						} else if ($('#languageChange').val() == 'it') {
+							que = "Non ci sono tutor disponibili al momento.";
+						}
+						let image
+						let name
+						let surname
+						let contactMessage = '';
+						
+						if (result.success) {
+							name = result.data.tutor.name;
+							surname = result.data.tutor.surname;
+							const email = result.data.tutor.email;
+							const mobileNumber = result.data.tutor.mobileNumber;
+							const profileImage = result.data.tutor.imageUrl;
+							const description = result.data.tutor.description;
+							notificationId = result.data.notificationId;
+							image = profileImage
+							
+							// Set tutor description
+							if ($('#languageChange').val() == 'en') {
+								que = description;
+								contactMessage = `You can now contact the tutor at the number ${mobileNumber}. Have a nice lesson!`;
+							} else if ($('#languageChange').val() == 'it') {
+								que = description;
+								contactMessage = `Ora puoi contattare il tutor al numero ${mobileNumber}. Buona lezione!`;
+							}
+						}
+						
+						// Show tutor profile
+						if (image) {
+							$('#messages').append('<div class="message to ready image_size"><img src=' + image + ' alt="" width="70" height="70"><figcaption>' + que + '</div>').animate({ scrollTop: $("#messages").offset().top + 900 }, 600);
+
+							// get_question(convState, ready);
+						} else {
+							$('#messages').append('<div class="message to ready">' + que + '</div>').animate({ scrollTop: $("#messages").offset().top + 900 }, 600);
+							// get_question(convState, ready);
+						}
+						
+						// Show contact message and end conversation
+						if (result.success && contactMessage) {
+							setTimeout(() => {
+								$('#messages').append('<div class="message to ready">' + contactMessage + '</div>').animate({ scrollTop: $("#messages").offset().top + 900 }, 600);
+								
+								// Disable input after successful tutor assignment
+								$('#userInput').prop('disabled', true);
+								$('.submit').prop('disabled', true);
+								$('#userInput').attr('placeholder', $('#languageChange').val() == 'it' ? 'Conversazione terminata' : 'Conversation ended');
+								$('#userInput').css({
+									'background-color': '#f5f5f5',
+									'color': '#888',
+									'cursor': 'not-allowed'
+								});
+								$('.submit').css({
+									'background-color': '#ccc',
+									'cursor': 'not-allowed'
+								});
+								
+								// End the conversation without calling ready
+							}, 1500);
+						} else {
+							// No tutor found, end conversation and disable input
+							setTimeout(() => {
+								// Disable input when no tutor is found
+								$('#userInput').prop('disabled', true);
+								$('.submit').prop('disabled', true);
+								$('#userInput').attr('placeholder', $('#languageChange').val() == 'it' ? 'Nessun tutor disponibile' : 'No tutor available');
+								$('#userInput').css({
+									'background-color': '#f5f5f5',
+									'color': '#888',
+									'cursor': 'not-allowed'
+								});
+								$('.submit').css({
+									'background-color': '#ccc',
+									'cursor': 'not-allowed'
+								});
+								
+								// End the conversation without calling ready
+							}, 1000);
+						}
+					}
+				});
+			}
+
+			function get_question(convState, ready) {
+				if (convState.current.answer.value === 'end') {
+					setTimeout(ready, Math.random() * 500 + 100);
+				} else {
+					if (Array.isArray(convState.current.answer)) {
+						var answer = convState.current.answer.join(',');
+						userData[convState.current.input.name] = answer;
+					}
+					else {
+						var answer = convState.current.answer.text;
+						userData[convState.current.input.name] = answer;
+					}
+					var queryString = '';
+					if (userData.age && userData.name && userData.subject && !userData.website) {
+						var d = new Date();
+						var n = d.getTime();
+						var name = userData.name.replace(/\s/g, '')
+						userData.email = n + name + "@gmail.com"
+					}
+					
+					// Skip mobile number question (question 7 and beyond) - tutor assignment will handle the end
+					if (count >= 7) {
+						// Don't fetch question 7 or higher, let tutor assignment handle the conversation end
+						// Create a simple end state to prevent further questions
+						convState.current.next = convState.newState({
+							type: 'text',
+							name: 'end',
+							questions: [''],
+							answers: [{text: 'end', value: 'end'}]
+						});
+						setTimeout(ready, 500);
+						return;
+					}
+					
+					for (var key in userData) {
+						if (userData.hasOwnProperty(key)) {
+							queryString += '&' + key + '=' + userData[key];
+						}
+					}
+					
+					jQuery.ajax({
+						url, data: { language: $('#languageChange').val(), question: count, email: userData.email, subject: userData.subject, location: userData.location, mobilenumber: userData.mobilenumber, name: userData.name, age: userData.age, website: userData.website, notificationId: notificationId }, async: false, method: 'post', 
+						success: function (result) {
+							var qData = result.data.data;
+							if (qData[0].type == "select" && qData[0].languageCode == "it") {
+								setTimeout(function () {
+									$("#userInput").attr("placeholder", "seleziona un'opzione");
+								}, 2000);
+							}
+							else if (qData[0].type == "select" && qData[0].languageCode == "en") {
+								setTimeout(function () {
+									$("#userInput").attr("placeholder", "Select an option");
+								}, 2000);
+
+							}
+							else if (qData[0].type == "text" && qData[0].languageCode == "en") {
+								setTimeout(function () {
+									$("#userInput").attr("placeholder", "Type Here");
+								}, 5);
+
+							}
+							else if (qData[0].type == "text" && qData[0].languageCode == "it") {
+								setTimeout(function () {
+									$("#userInput").attr("placeholder", "digita qui");
+								}, 5);
+							} else if (qData[0].title == "contacting_tutor" && qData[0].languageCode == "it") {
+								setTimeout(function () {
+									$("#userInput").attr("placeholder", "seleziona un'opzione");
+								}, 2000);
+							}
+
+							var pattern = '';
+							for (var i = 0; i < qData.length; i++) {
+								if (qData[i].title == 'email') {
+									pattern = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$";
+								}
+								newQuestion = qData[i].question;
+								count = qData[i].question_num;
+								var questionTitle = qData[i].title;
+								newQuestion = newQuestion.replace("{name}", answer);
+
+								if (qData[i].no_answer == 1) {
+									convState.current.next = convState.newState({
+										type: 'text',
+										noAnswer: true,
+										name: questionTitle,
+										questions: [newQuestion],
+									});
+									lastNext = 1;
+								} else {
+									if (lastNext == 1) {
+										lastNext = 0;
+										if (qData[i].type == 'text') {
+											convState.current.next.next = convState.newState({
+												type: 'text',
+												name: questionTitle,
+												pattern: pattern,
+												questions: [newQuestion],
+											});
+										} else {
+											convState.current.next.next = convState.newState({
+												type: 'select',
+												name: questionTitle,
+												questions: [newQuestion],
+												answers: qData[i].options,
+												multiple: questionTitle === 'subject', // Enable multiple selection for subjects
+												selected: questionTitle === 'subject' ? [] : ""
+											});
+										}
+									} else {
+										if (qData[i].type == 'text') {
+											convState.current.next = convState.newState({
+												type: 'text',
+												pattern: pattern,
+												name: questionTitle,
+												questions: [newQuestion],
+											});
+
+										} else {
+											answersOption = qData[i].options;
+											convState.current.next = convState.newState({
+												type: 'select',
+												name: questionTitle,
+												questions: [newQuestion],
+												answers: answersOption,
+												multiple: questionTitle === 'subject', // Enable multiple selection for subjects
+												selected: questionTitle === 'subject' ? [] : ""
+											});
+										}
+									}
+								}
+							}
+						}
+					});
+					setTimeout(ready, Math.random() * 500 + 500);
+				}
+				count++;
+			}
+		});
+	</script>
+</body>
+
+</html>

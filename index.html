@@ -5,7 +5,63 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
         <title>Ripetizioni private a Treviso - TVTOR</title>
-        <meta name="description" content="Trova tutor qualificati per ripetizioni nella provincia di Treviso. Avvia la chat e richiedi subito il tuo tutor.">
+        <meta name="description" content="Trova tutor qualificati per ripetizioni nella provincia di Treviso. Avvia la chat e richiedi subito il tuo tutor  subito il tuo tutor.">
+        <!-- Google Tag Manager (noscript) -->
+        <noscript>
+            <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NC4MZQ83" height="0" width="0" style="display:none;visibility:hidden"></iframe>
+        </noscript>
+        <!-- End Google Tag Manager (noscript) -->
+
+        <!-- Chat Widget Container -->
+        <div id="chat-widget-container">
+            <div id="chat-widget-overlay" onclick="closeChatWidget()"></div>
+            <div id="chat-widget-popup">
+                <div class="chat-widget-header">
+                    <h3>TVTOR - Trova il tuo tutor</h3>
+                    <button class="chat-widget-close" onclick="closeChatWidget()">&times;</button>
+                </div>
+                <div class="chat-widget-body">
+                    <iframe src="" class="chat-widget-iframe" id="chat-iframe"></iframe>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            let chatWidgetOpen = false;
+            function toggleChatWidget() {
+                if (chatWidgetOpen) {
+                    closeChatWidget();
+                } else {
+                    openChatWidget();
+                }
+            }
+            function openChatWidget() {
+                const popup = document.getElementById('chat-widget-popup');
+                const overlay = document.getElementById('chat-widget-overlay');
+                const iframe = document.getElementById('chat-iframe');
+                iframe.src = 'chatbot/chatbot.html';
+                popup.classList.add('show');
+                if (window.innerWidth <= 480) {
+                    overlay.classList.add('show');
+                    document.body.style.overflow = 'hidden';
+                }
+                chatWidgetOpen = true;
+            }
+            function closeChatWidget() {
+                const popup = document.getElementById('chat-widget-popup');
+                const overlay = document.getElementById('chat-widget-overlay');
+                const iframe = document.getElementById('chat-iframe');
+                popup.classList.remove('show');
+                overlay.classList.remove('show');
+                setTimeout(() => { if (!chatWidgetOpen) iframe.src = ''; }, 300);
+                chatWidgetOpen = false;
+                document.body.style.overflow = '';
+            }
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape' && chatWidgetOpen) closeChatWidget();
+            });
+        </script>
+    </body>
 
         <!-- favicon -->
         <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
@@ -32,6 +88,7 @@
         <!-- CSS -->
         <link rel="stylesheet" href="css/bootstrap.min.css">
         <link rel="stylesheet" type="text/css" href="css/style.css"/>
+        <link rel="stylesheet" type="text/css" href="chatbot/css/chatbot-modal.css"/>
 
         <!-- Font Awesome -->
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css">
@@ -75,7 +132,7 @@
         <meta name="google-site-verification" content="3KgeJG8Svhe4UBfsK596T47QzMztchG0aYrdhH3izjk" />
     </head>
     <body>
-        <a href="https://chat.tvtor.it" target="_blank" id="chat-widget">
+        <a href="#" id="chat-widget" onclick="toggleChatWidget()">
             <i class="fas fa-comments"></i>
         </a>
 
