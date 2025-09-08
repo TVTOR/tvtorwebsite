@@ -91,6 +91,8 @@
         height: 100%;
         border-radius: 0;
         animation: slideUpMobile 0.3s ease-out;
+        z-index: 9999; /* Higher than overlay */
+        pointer-events: auto; /* Ensure popup can receive clicks */
     }
     
     @keyframes slideUpMobile {
@@ -113,6 +115,7 @@
 }
 
 /* Overlay for mobile */
+/* Overlay for mobile */
 #chat-widget-overlay {
     display: none;
     position: fixed;
@@ -121,11 +124,12 @@
     width: 100%;
     height: 100%;
     background: rgba(0,0,0,0.3);
-    z-index: 9999;
+    z-index: 9998;
 }
 
 #chat-widget-overlay.show {
     display: block;
+    pointer-events: none; /* This allows clicks to pass through to the popup */
 }
 
 /* Notification badge */
@@ -143,4 +147,52 @@
     align-items: center;
     justify-content: center;
     font-weight: 600;
+}
+
+
+/* Floating Chat Button */
+#chat-widget-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #007AFF 0%, #0051D5 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(0, 122, 255, 0.3);
+    z-index: 9999;
+    transition: all 0.3s ease;
+}
+
+#chat-widget-button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 25px rgba(0, 122, 255, 0.4);
+}
+
+#chat-widget-button i {
+    color: white;
+    font-size: 24px;
+}
+
+/* Hide floating button when chat is open */
+#chat-widget-container.chat-open #chat-widget-button {
+    display: none;
+}
+
+/* Mobile adjustments */
+@media (max-width: 480px) {
+    #chat-widget-button {
+        width: 56px;
+        height: 56px;
+        bottom: 16px;
+        right: 16px;
+    }
+    
+    #chat-widget-button i {
+        font-size: 22px;
+    }
 }

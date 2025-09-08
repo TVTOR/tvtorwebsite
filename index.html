@@ -12,20 +12,6 @@
         </noscript>
         <!-- End Google Tag Manager (noscript) -->
 
-        <!-- Chat Widget Container -->
-        <div id="chat-widget-container">
-            <div id="chat-widget-overlay" onclick="closeChatWidget()"></div>
-            <div id="chat-widget-popup">
-                <div class="chat-widget-header">
-                    <h3>TVTOR - Trova il tuo tutor</h3>
-                    <button class="chat-widget-close" onclick="closeChatWidget()">&times;</button>
-                </div>
-                <div class="chat-widget-body">
-                    <iframe src="" class="chat-widget-iframe" id="chat-iframe"></iframe>
-                </div>
-            </div>
-        </div>
-
         <script>
             let chatWidgetOpen = false;
             function toggleChatWidget() {
@@ -36,11 +22,15 @@
                 }
             }
             function openChatWidget() {
+                const container = document.getElementById('chat-widget-container');
                 const popup = document.getElementById('chat-widget-popup');
                 const overlay = document.getElementById('chat-widget-overlay');
                 const iframe = document.getElementById('chat-iframe');
+                
                 iframe.src = 'chatbot/chatbot.html';
                 popup.classList.add('show');
+                container.classList.add('chat-open');
+                
                 if (window.innerWidth <= 480) {
                     overlay.classList.add('show');
                     document.body.style.overflow = 'hidden';
@@ -48,14 +38,18 @@
                 chatWidgetOpen = true;
             }
             function closeChatWidget() {
+                const container = document.getElementById('chat-widget-container');
                 const popup = document.getElementById('chat-widget-popup');
                 const overlay = document.getElementById('chat-widget-overlay');
                 const iframe = document.getElementById('chat-iframe');
+                
                 popup.classList.remove('show');
+                container.classList.remove('chat-open');
                 overlay.classList.remove('show');
+                document.body.style.overflow = '';
+                
                 setTimeout(() => { if (!chatWidgetOpen) iframe.src = ''; }, 300);
                 chatWidgetOpen = false;
-                document.body.style.overflow = '';
             }
             document.addEventListener('keydown', function(event) {
                 if (event.key === 'Escape' && chatWidgetOpen) closeChatWidget();
@@ -132,9 +126,24 @@
         <meta name="google-site-verification" content="3KgeJG8Svhe4UBfsK596T47QzMztchG0aYrdhH3izjk" />
     </head>
     <body>
-        <a href="#" id="chat-widget" onclick="toggleChatWidget()">
-            <i class="fas fa-comments"></i>
-        </a>
+        <!-- Chat Widget Container -->
+        <div id="chat-widget-container">
+            <div id="chat-widget-overlay" onclick="closeChatWidget()"></div>
+            <div id="chat-widget-popup">
+                <div class="chat-widget-header">
+                    <h3>TVTOR - Trova il tuo tutor</h3>
+                    <button class="chat-widget-close" onclick="closeChatWidget()">&times;</button>
+                </div>
+                <div class="chat-widget-body">
+                    <iframe src="" class="chat-widget-iframe" id="chat-iframe"></iframe>
+                </div>
+            </div>
+            
+            <!-- Floating Chat Button -->
+            <div id="chat-widget-button" onclick="toggleChatWidget()">
+                <i class="fas fa-comments"></i>
+            </div>
+        </div>
 
         <nav class="navbar navbar-expand navbar-light bg-light position-fixed col-md-10 offset-md-1">
             <div class=" w-100 dual-collapse2">
@@ -144,7 +153,7 @@
                 </button>
             </div>
             <div class="navbar-collapse collapse mx-auto order-0">
-                <a class="navbar-brand mx-auto richiedi_tutor" href="#" onclick="openChatWidget(); return false;">Richiedi tutor</a>
+                <a class="navbar-brand mx-auto richiedi_tutor" href="#" onclick="toggleChatWidget(); return false;">Richiedi tutor</a>
             </div>
             <div class="navbar-collapse collapse w-100 order-3 dual-collapse2 navbar-right">
                 <ul class="navbar-nav">
