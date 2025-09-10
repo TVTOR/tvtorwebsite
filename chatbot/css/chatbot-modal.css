@@ -10,7 +10,7 @@
 #chat-widget-popup {
     display: none;
     position: absolute;
-    bottom: 80px;
+    bottom: 5px;
     right: 0;
     width: 380px;
     height: 600px;
