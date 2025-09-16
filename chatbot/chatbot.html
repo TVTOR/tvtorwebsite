@@ -329,7 +329,8 @@
 					setTimeout(ready, Math.random() * 500 + 100);
 				} else {
 					if (Array.isArray(convState.current.answer)) {
-						var answer = convState.current.answer.join(',');
+						// For multiple selections (like subjects), send as array instead of comma-separated string
+						var answer = convState.current.answer;
 						userData[convState.current.input.name] = answer;
 					}
 					else {
