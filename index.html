@@ -13,7 +13,7 @@
         <!-- End Google Tag Manager (noscript) -->
 
         <!--Start of Tawk.to Script-->
-        <!-- <script type="text/javascript">
+        <script type="text/javascript">
             var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
             (function(){
                 var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
@@ -54,10 +54,10 @@
                 }
               }
             };
-        </script> -->
+        </script>
         <!--End of Tawk.to Script-->
 
-        <script>
+        <!-- <script>
             let chatWidgetOpen = false;
             function toggleChatWidget() {
                 if (chatWidgetOpen) {
@@ -99,7 +99,7 @@
             document.addEventListener('keydown', function(event) {
                 if (event.key === 'Escape' && chatWidgetOpen) closeChatWidget();
             });
-        </script>
+        </script> -->
 
         <!-- favicon -->
         <link rel="icon" href="/favicon/favicon.ico" type="image/x-icon">
@@ -184,9 +184,9 @@
                 </div>
             </div>
             
-            <div id="chat-widget-button" onclick="toggleChatWidget()">
+            <!-- <div id="chat-widget-button" onclick="toggleChatWidget()">
                 <i class="fas fa-comments"></i>
-            </div>
+            </div> -->
         </div>
 
         <nav class="navbar navbar-expand navbar-light bg-light position-fixed col-md-10 offset-md-1">
@@ -197,7 +197,7 @@
                 </button>
             </div>
             <div class="navbar-collapse collapse mx-auto order-0">
-                <a class="navbar-brand mx-auto richiedi_tutor" href="#" onclick="toggleChatWidget(); return false;">Richiedi tutor</a>
+                <a class="navbar-brand mx-auto richiedi_tutor" href="#" onclick="openTawk(); return false;">Richiedi tutor</a>
                 <!-- <a class="navbar-brand mx-auto richiedi_tutor" href="#" onclick="openTawk(); return false;">Richiedi tutor</a> -->
             </div>
             <div class="navbar-collapse collapse w-100 order-3 dual-collapse2 navbar-right">
