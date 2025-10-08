@@ -86,20 +86,7 @@
 					<div class="col-sm-6 col-sm-offset-3 col-xs-offset-0">
 						<div class="card no-border">
 							<div id="chat">
-								<form action="" id="form-chatbot" method="GET" class="hidden">
-									<select id="question-data-it"
-										data-conv-question="Ciao, benvenuto su TVTOR, posso aiutarti a trovare un tutor?"
-										name="first-question">
-										<option value="si">si</option>
-										<option value="certo">certo!</option>
-									</select>
-									<select id="question-data-en" style="display: none;"
-										data-conv-question="Hello! Welcome to TVTOR. Can I help you to find a tutor?"
-										name="first-question">
-										<option value="yes">Yes</option>
-										<option value="sure">Sure!</option>
-									</select>
-								</form>
+								<!-- Chatbot will start directly with question 3 (subject) -->
 							</div>
 						</div>
 					</div>
@@ -193,15 +180,11 @@
 				}
 			});
 
-			// Initialize Italian language by default
+			// Initialize Italian language by default and start with first question
 			setTimeout(function() {
 				$('#languageChange').val('it').trigger('change');
-				// Ensure the placeholder is set to Italian on first load
-				setTimeout(function() {
-					if ($("#userInput").length && $("#userInput").attr("placeholder") === "Select an option") {
-						$("#userInput").attr("placeholder", "seleziona un'opzione");
-					}
-				}, 100);
+				// Start the chatbot with question 3 (subject)
+				get_question({current: {answer: {value: 'start'}}}, function() {});
 			}, 500);
 
 			function locationCheck() {
@@ -329,6 +312,86 @@
 			function get_question(convState, ready) {
 				if (convState.current.answer.value === 'end') {
 					setTimeout(ready, Math.random() * 500 + 100);
+				} else if (convState.current.answer.value === 'start') {
+					// Initialize with question 3 (subject)
+					jQuery.ajax({
+						url, data: { language: $('#languageChange').val(), question: 3, email: '', subject: '', location: '', mobilenumber: '', age: '', website: '', notificationId: '' }, async: false, method: 'post', 
+						success: function (result) {
+							var qData = result.data.data;
+							if (qData[0].type == "select" && qData[0].languageCode == "it") {
+								setTimeout(function () {
+									$("#userInput").attr("placeholder", "seleziona un'opzione");
+								}, 2000);
+							}
+							else if (qData[0].type == "select" && qData[0].languageCode == "en") {
+								setTimeout(function () {
+									$("#userInput").attr("placeholder", "Select an option");
+								}, 2000);
+							}
+
+							var pattern = '';
+							for (var i = 0; i < qData.length; i++) {
+								if (qData[i].title == 'email') {
+									pattern = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$";
+								}
+								newQuestion = qData[i].question;
+								count = qData[i].question_num;
+								var questionTitle = qData[i].title;
+
+								if (qData[i].no_answer == 1) {
+									convState.current.next = convState.newState({
+										type: 'text',
+										noAnswer: true,
+										name: questionTitle,
+										questions: [newQuestion],
+									});
+									lastNext = 1;
+								} else {
+									if (lastNext == 1) {
+										lastNext = 0;
+										if (qData[i].type == 'text') {
+											convState.current.next.next = convState.newState({
+												type: 'text',
+												name: questionTitle,
+												pattern: pattern,
+												questions: [newQuestion],
+											});
+										} else {
+											convState.current.next.next = convState.newState({
+												type: 'select',
+												name: questionTitle,
+												questions: [newQuestion],
+												answers: qData[i].options,
+												multiple: questionTitle === 'subject', // Enable multiple selection for subjects
+												selected: questionTitle === 'subject' ? [] : ""
+											});
+										}
+									} else {
+										if (qData[i].type == 'text') {
+											convState.current.next = convState.newState({
+												type: 'text',
+												pattern: pattern,
+												name: questionTitle,
+												questions: [newQuestion],
+											});
+
+										} else {
+											answersOption = qData[i].options;
+											convState.current.next = convState.newState({
+												type: 'select',
+												name: questionTitle,
+												questions: [newQuestion],
+												answers: answersOption,
+												multiple: questionTitle === 'subject', // Enable multiple selection for subjects
+												selected: questionTitle === 'subject' ? [] : ""
+											});
+										}
+									}
+								}
+							}
+						}
+					});
+					setTimeout(ready, Math.random() * 500 + 500);
 				} else {
 					if (Array.isArray(convState.current.answer)) {
 						// For multiple selections (like subjects), send as array instead of comma-separated string
@@ -345,6 +408,19 @@
 						var d = new Date();
 						var n = d.getTime();
 						userData.email = n + 'student' + '@gmail.com'
+					}
+					
+					// Stop after age question (question 5) - we have all needed info
+					if (userData.age && userData.subject && userData.location) {
+						// We have all required data, stop asking questions
+						convState.current.next = convState.newState({
+							type: 'text',
+							name: 'end',
+							questions: [''],
+							answers: [{text: 'end', value: 'end'}]
+						});
+						setTimeout(ready, 500);
+						return;
 					}
 					
 					// Skip questions after age (question 5) - tutor assignment will handle the end
