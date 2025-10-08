@@ -164,7 +164,7 @@
 			var isAssignTutor_check = true;
 			var setIntervalTime;
 			var newQuestion = '';
-			var count = 2;
+			var count = 3;
 			var lastNext = 0;
 			let notificationId = ""
 			var url = `${baseUrl}/question`
@@ -174,13 +174,7 @@
 				eventList: {
 					onInputSubmit: function (convState, ready) {
 						get_question(convState, ready);
-						if (convState.current.input.name != "name") {
-							$("#chat").addClass("danger");
-						}
-						if (convState.current.input.name == "name") {
-							$("#chat").removeClass("danger");
-
-						}
+					// Remove name validation since we skip name question
 						if (convState.current.input.name == "age") {
 							$("#chat").removeClass("danger");
 
@@ -346,15 +340,15 @@
 						userData[convState.current.input.name] = answer;
 					}
 					var queryString = '';
-					if (userData.age && userData.name && userData.subject && !userData.website) {
+					// Generate email without name since we skip name question
+					if (userData.age && userData.subject && !userData.website) {
 						var d = new Date();
 						var n = d.getTime();
-						var name = userData.name.replace(/\s/g, '')
-						userData.email = n + name + "@gmail.com"
+						userData.email = n + 'student' + '@gmail.com'
 					}
 					
-					// Skip mobile number question (question 7 and beyond) - tutor assignment will handle the end
-					if (count >= 7) {
+					// Skip questions after age (question 5) - tutor assignment will handle the end
+					if (count >= 6) {
 						// Don't fetch question 7 or higher, let tutor assignment handle the conversation end
 						// Create a simple end state to prevent further questions
 						convState.current.next = convState.newState({
@@ -374,7 +368,7 @@
 					}
 					
 					jQuery.ajax({
-						url, data: { language: $('#languageChange').val(), question: count, email: userData.email, subject: userData.subject, location: userData.location, mobilenumber: userData.mobilenumber, name: userData.name, age: userData.age, website: userData.website, notificationId: notificationId }, async: false, method: 'post', 
+						url, data: { language: $('#languageChange').val(), question: count, email: userData.email, subject: userData.subject, location: userData.location, mobilenumber: userData.mobilenumber, age: userData.age, website: userData.website, notificationId: notificationId }, async: false, method: 'post', 
 						success: function (result) {
 							var qData = result.data.data;
 							if (qData[0].type == "select" && qData[0].languageCode == "it") {
