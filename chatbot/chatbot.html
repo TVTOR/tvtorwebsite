@@ -177,18 +177,6 @@
 					// Remove name validation since we skip name question
 						if (convState.current.input.name == "age") {
 							$("#chat").removeClass("danger");
-
-						}
-						if (userData.hasOwnProperty('subject') && userData.hasOwnProperty('location') && userData.hasOwnProperty('age')) {
-							console.log('All data collected, starting tutor assignment check...');
-							setIntervalTime = setInterval(() => {
-								if (isAssignTutor) {
-									checkTutorAssignOrNot(convState, ready);
-								}
-							}, 2000);
-							setTimeout(function () {
-								clearInterval(setIntervalTime);
-							}, 60000);
 						}
 					}
 				}
@@ -231,7 +219,6 @@
 								isAssignTutor_check = false
 								assignTutor(convState, ready);
 							}
-
 						}
 					})
 				}
@@ -352,27 +339,41 @@
 					
 					// Stop after age question (question 5) - we have all needed info
 					if (userData.age && userData.subject && userData.location) {
-						// We have all required data, stop asking questions
-						convState.current.next = convState.newState({
-							type: 'text',
-							name: 'end',
-							questions: [''],
-							answers: [{text: 'end', value: 'end'}]
-						});
-						setTimeout(ready, 500);
+						// We have all required data, show processing message and start tutor assignment
+						console.log('All data collected, starting tutor assignment process...');
+						
+						// Show processing message
+						var processingMessage = $('#languageChange').val() == 'it' ? 
+							'Grazie! Stiamo cercando il miglior tutor per te. Attendi per favore...' : 
+							'Thank you! We\'re finding the best tutor for you. Please wait...';
+						
+						$('#messages').append('<div class="message to ready">' + processingMessage + '</div>').animate({ scrollTop: $("#messages").offset().top + 600 }, 600);
+						
+						// Start tutor assignment process immediately
+						setTimeout(() => {
+							if (isAssignTutor) {
+								checkTutorAssignOrNot(convState, ready);
+							}
+						}, 1000);
+						
+						// Also set up the interval as backup
+						setIntervalTime = setInterval(() => {
+							if (isAssignTutor) {
+								checkTutorAssignOrNot(convState, ready);
+							}
+						}, 2000);
+						setTimeout(function () {
+							clearInterval(setIntervalTime);
+						}, 60000);
+						
+						// Don't call ready() - this prevents the chatbot from continuing to look for questions
 						return;
 					}
 					
 					// Skip questions after age (question 5) - tutor assignment will handle the end
 					if (count >= 6) {
 						// Don't fetch question 7 or higher, let tutor assignment handle the conversation end
-						// Create a simple end state to prevent further questions
-						convState.current.next = convState.newState({
-							type: 'text',
-							name: 'end',
-							questions: [''],
-							answers: [{text: 'end', value: 'end'}]
-						});
+						// Just return without creating an end state - let tutor assignment handle it
 						setTimeout(ready, 500);
 						return;
 					}
