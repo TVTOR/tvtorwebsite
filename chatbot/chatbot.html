@@ -86,7 +86,20 @@
 					<div class="col-sm-6 col-sm-offset-3 col-xs-offset-0">
 						<div class="card no-border">
 							<div id="chat">
-								<!-- Chatbot will start directly with question 3 (subject) -->
+								<form action="" id="form-chatbot" method="GET" class="hidden">
+									<select id="question-data-it"
+										data-conv-question="Ciao, benvenuto su TVTOR, posso aiutarti a trovare un tutor?"
+										name="first-question">
+										<option value="si">si</option>
+										<option value="certo">certo!</option>
+									</select>
+									<select id="question-data-en" style="display: none;"
+										data-conv-question="Hello! Welcome to TVTOR. Can I help you to find a tutor?"
+										name="first-question">
+										<option value="yes">Yes</option>
+										<option value="sure">Sure!</option>
+									</select>
+								</form>
 							</div>
 						</div>
 					</div>
@@ -166,7 +179,8 @@
 							$("#chat").removeClass("danger");
 
 						}
-						if (userData.hasOwnProperty('subject') && userData.hasOwnProperty('location')) {
+						if (userData.hasOwnProperty('subject') && userData.hasOwnProperty('location') && userData.hasOwnProperty('age')) {
+							console.log('All data collected, starting tutor assignment check...');
 							setIntervalTime = setInterval(() => {
 								if (isAssignTutor) {
 									checkTutorAssignOrNot(convState, ready);
@@ -180,11 +194,15 @@
 				}
 			});
 
-			// Initialize Italian language by default and start with first question
+			// Initialize Italian language by default
 			setTimeout(function() {
 				$('#languageChange').val('it').trigger('change');
-				// Start the chatbot with question 3 (subject)
-				get_question({current: {answer: {value: 'start'}}}, function() {});
+				// Ensure the placeholder is set to Italian on first load
+				setTimeout(function() {
+					if ($("#userInput").length && $("#userInput").attr("placeholder") === "Select an option") {
+						$("#userInput").attr("placeholder", "seleziona un'opzione");
+					}
+				}, 100);
 			}, 500);
 
 			function locationCheck() {
@@ -203,10 +221,12 @@
 			}
 
 			function checkTutorAssignOrNot(convState, ready) {
+				console.log('Checking tutor assignment...');
 				var checkLocationUrl = `${baseUrl}/checkTutorAssignOrNot/${userData.email}`;
 				if (isAssignTutor) {
 					jQuery.ajax({
 						url: checkLocationUrl, async: true, method: 'get', data: userData, success: function (result) {
+							console.log('Tutor assignment check result:', result);
 							if (result.data && isAssignTutor && isAssignTutor_check) {
 								isAssignTutor_check = false
 								assignTutor(convState, ready);
@@ -312,86 +332,6 @@
 			function get_question(convState, ready) {
 				if (convState.current.answer.value === 'end') {
 					setTimeout(ready, Math.random() * 500 + 100);
-				} else if (convState.current.answer.value === 'start') {
-					// Initialize with question 3 (subject)
-					jQuery.ajax({
-						url, data: { language: $('#languageChange').val(), question: 3, email: '', subject: '', location: '', mobilenumber: '', age: '', website: '', notificationId: '' }, async: false, method: 'post', 
-						success: function (result) {
-							var qData = result.data.data;
-							if (qData[0].type == "select" && qData[0].languageCode == "it") {
-								setTimeout(function () {
-									$("#userInput").attr("placeholder", "seleziona un'opzione");
-								}, 2000);
-							}
-							else if (qData[0].type == "select" && qData[0].languageCode == "en") {
-								setTimeout(function () {
-									$("#userInput").attr("placeholder", "Select an option");
-								}, 2000);
-							}
-
-							var pattern = '';
-							for (var i = 0; i < qData.length; i++) {
-								if (qData[i].title == 'email') {
-									pattern = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$";
-								}
-								newQuestion = qData[i].question;
-								count = qData[i].question_num;
-								var questionTitle = qData[i].title;
-
-								if (qData[i].no_answer == 1) {
-									convState.current.next = convState.newState({
-										type: 'text',
-										noAnswer: true,
-										name: questionTitle,
-										questions: [newQuestion],
-									});
-									lastNext = 1;
-								} else {
-									if (lastNext == 1) {
-										lastNext = 0;
-										if (qData[i].type == 'text') {
-											convState.current.next.next = convState.newState({
-												type: 'text',
-												name: questionTitle,
-												pattern: pattern,
-												questions: [newQuestion],
-											});
-										} else {
-											convState.current.next.next = convState.newState({
-												type: 'select',
-												name: questionTitle,
-												questions: [newQuestion],
-												answers: qData[i].options,
-												multiple: questionTitle === 'subject', // Enable multiple selection for subjects
-												selected: questionTitle === 'subject' ? [] : ""
-											});
-										}
-									} else {
-										if (qData[i].type == 'text') {
-											convState.current.next = convState.newState({
-												type: 'text',
-												pattern: pattern,
-												name: questionTitle,
-												questions: [newQuestion],
-											});
-
-										} else {
-											answersOption = qData[i].options;
-											convState.current.next = convState.newState({
-												type: 'select',
-												name: questionTitle,
-												questions: [newQuestion],
-												answers: answersOption,
-												multiple: questionTitle === 'subject', // Enable multiple selection for subjects
-												selected: questionTitle === 'subject' ? [] : ""
-											});
-										}
-									}
-								}
-							}
-						}
-					});
-					setTimeout(ready, Math.random() * 500 + 500);
 				} else {
 					if (Array.isArray(convState.current.answer)) {
 						// For multiple selections (like subjects), send as array instead of comma-separated string
@@ -442,6 +382,10 @@
 							queryString += '&' + key + '=' + userData[key];
 						}
 					}
+					
+					// Debug: log userData to see what we're sending
+					console.log('Sending data:', userData);
+					console.log('Count:', count);
 					
 					jQuery.ajax({
 						url, data: { language: $('#languageChange').val(), question: count, email: userData.email, subject: userData.subject, location: userData.location, mobilenumber: userData.mobilenumber, age: userData.age, website: userData.website, notificationId: notificationId }, async: false, method: 'post', 
