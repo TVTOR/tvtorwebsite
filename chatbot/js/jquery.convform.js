@@ -204,7 +204,7 @@ ConvState.prototype.printAnswers = function (answers, multiple) {
                         if ($("#userInput").attr("placeholder") == "Select an option" && $('#languageChange').val() == 'en') {
                             $("#userInput").attr("placeholder", "seleziona un'opzione");
                         } else {
-                            $("textarea#userInput").attr("placeholder", "digita qui");
+                            $("textarea#userInput").attr("placeholder", "Digita qui");
 
                         }
                         if ($("#userInput").attr("placeholder") == "Select an option" && ('#languageChange').val() == 'en') {
@@ -212,9 +212,9 @@ ConvState.prototype.printAnswers = function (answers, multiple) {
                             $("#userInput").attr("placeholder", "Select an option");
                         } else {
                             setTimeout(function () {
-                                $("#userInput").attr("placeholder", "digita qui");
+                                $("#userInput").attr("placeholder", "Digita qui");
                             }, 5);
-                            $("#userInput").attr("placeholder", "digita qui");
+                            $("#userInput").attr("placeholder", "Digita qui");
 
                         }
                         if ($("#userInput").attr("placeholder") == "Select an option" && ('#languageChange').val() == 'it') {
@@ -450,7 +450,7 @@ ConvState.prototype.updateSubjectCounter = function () {
             if ($('#languageChange').val() == 'en') {
                 parameters.placeHolder = 'Type Here'
             } else {
-                parameters.placeHolder = "dshcfdhvdhfvdh"
+                parameters.placeHolder = "..."
             }
             switch (parameters.typeInputUi) {
                 case 'input':

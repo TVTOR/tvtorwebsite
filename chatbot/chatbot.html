@@ -88,16 +88,14 @@
 							<div id="chat">
 								<form action="" id="form-chatbot" method="GET" class="hidden">
 									<select id="question-data-it"
-										data-conv-question="Ciao, benvenuto su TVTOR, posso aiutarti a trovare un tutor?"
+										data-conv-question="Ciao! Inizia la chat per trovare subito il tuo tutor per fare ripetizioni: bastano 3 domande e non costa nulla per te."
 										name="first-question">
-										<option value="si">si</option>
-										<option value="certo">certo!</option>
+										<option value="iniziamo">Iniziamo!</option>
 									</select>
 									<select id="question-data-en" style="display: none;"
-										data-conv-question="Hello! Welcome to TVTOR. Can I help you to find a tutor?"
+										data-conv-question="Hi! Start the chat to quickly find your tutor for private lessons — just answer 3 questions, it’s completely free for you."
 										name="first-question">
-										<option value="yes">Yes</option>
-										<option value="sure">Sure!</option>
+										<option value="letsstart">Let's start</option>
 									</select>
 								</form>
 							</div>
@@ -121,19 +119,16 @@
 				$('#question-data-en').hide();
 	
 				$('.message:first-child').html('')
-				$('.message:first-child').html('Ciao, benvenuto su TVTOR, posso aiutarti a trovare un tutor?')
-				$("#convForm .option:first-child").html('si')
-				$("#convForm .option:nth-child(2)").html('certo')
-				$("#convForm .option:first-child").text('si')
-				$("#convForm .option:nth-child(2)").text('certo')
+				$('.message:first-child').html('Ciao! Inizia la chat per trovare subito il tuo tutor per fare ripetizioni: bastano 3 domande e non costa nulla per te.')
+				$("#convForm .option:first-child").html('Iniziamo!')
+				$("#convForm .option:first-child").text('Iniziamo!')
 
-				$("#convForm .option:first-child").val('si')
-				$("#convForm .option:nth-child(2)").val('certo')
+				$("#convForm .option:first-child").val('Iniziamo!')
 				// Set Italian placeholder text
 				if ($("#userInput").attr("placeholder") == "Select an option" || $("#userInput").attr("placeholder") == "seleziona un'opzione") {
-					$("#userInput").attr("placeholder", "seleziona un'opzione");
+					$("#userInput").attr("placeholder", "Seleziona un'opzione");
 				} else {
-					$("textarea#userInput").attr("placeholder", "digita qui");
+					$("textarea#userInput").attr("placeholder", "Digita qui");
 				}
 				$(".submit").html('invia');
 
@@ -143,11 +138,9 @@
 				$('#question-data-it').hide();
 				
 				$('.message:first-child').html('')
-				$('.message:first-child').html('Hello! Welcome to TVTOR. Can I help you to find a tutor?')
-				$("#convForm .option:first-child").html('Yes')
-				$("#convForm .option:nth-child(2)").html('Sure')
-				$(".option:first-child").html('Yes')
-				$(".option:nth-child(2)").html('Sure')
+				$('.message:first-child').html('Hi! Start the chat to quickly find your tutor for private lessons — just answer 3 questions, it’s completely free for you.')
+				$("#convForm .option:first-child").html('Let\'s start')
+				$(".option:first-child").html('Let\'s start')
 				// Set English placeholder text
 				if ($("#userInput").attr("placeholder") == "seleziona un'opzione" || $("#userInput").attr("placeholder") == "Select an option") {
 					$("#userInput").attr("placeholder", "Select an option");
@@ -329,6 +322,13 @@
 						var answer = convState.current.answer.text;
 						userData[convState.current.input.name] = answer;
 					}
+					
+					// Debug: log what we're saving
+					console.log('Saving answer:', {
+						fieldName: convState.current.input.name,
+						answer: convState.current.answer,
+						userData: userData
+					});
 					var queryString = '';
 					// Generate email without name since we skip name question
 					if (userData.age && userData.subject && !userData.website) {
@@ -341,6 +341,28 @@
 					if (userData.age && userData.subject && userData.location) {
 						// We have all required data, show processing message and start tutor assignment
 						console.log('All data collected, starting tutor assignment process...');
+						
+						// Create notification by making a direct API call
+						console.log('Creating notification with all data:', userData);
+						jQuery.ajax({
+							url: `${baseUrl}/question`, 
+							data: { 
+								language: $('#languageChange').val(), 
+								question: count, 
+								email: userData.email, 
+								subject: userData.subject, 
+								location: userData.location, 
+								mobilenumber: userData.mobilenumber, 
+								age: userData.age, 
+								website: userData.website, 
+								notificationId: notificationId 
+							}, 
+							async: false, 
+							method: 'post',
+							success: function (result) {
+								console.log('Notification created successfully');
+							}
+						});
 						
 						// Show processing message
 						var processingMessage = $('#languageChange').val() == 'it' ? 
@@ -364,7 +386,30 @@
 						}, 2000);
 						setTimeout(function () {
 							clearInterval(setIntervalTime);
-						}, 60000);
+							// If no tutor assignment after 30 seconds, show timeout message
+							if (isAssignTutor) {
+								isAssignTutor = false;
+								var timeoutMessage = $('#languageChange').val() == 'it' ? 
+									'Non ci sono tutor disponibili al momento. Scrivici al +39 3485804824!' : 
+									'No tutors are available right now. Contact us at +393485804824!';
+								
+								$('#messages').append('<div class="message to ready">' + timeoutMessage + '</div>').animate({ scrollTop: $("#messages").offset().top + 600 }, 600);
+								
+								// Disable input after timeout
+								$('#userInput').prop('disabled', true);
+								$('.submit').prop('disabled', true);
+								$('#userInput').attr('placeholder', $('#languageChange').val() == 'it' ? 'Richiesta inviata' : 'Request sent');
+								$('#userInput').css({
+									'background-color': '#f5f5f5',
+									'color': '#888',
+									'cursor': 'not-allowed'
+								});
+								$('.submit').css({
+									'background-color': '#ccc',
+									'cursor': 'not-allowed'
+								});
+							}
+						}, 30000); // 30 seconds timeout
 						
 						// Don't call ready() - this prevents the chatbot from continuing to look for questions
 						return;
