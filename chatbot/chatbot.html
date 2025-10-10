@@ -88,14 +88,14 @@
 							<div id="chat">
 								<form action="" id="form-chatbot" method="GET" class="hidden">
 									<select id="question-data-it"
-										data-conv-question="Ciao! Inizia la chat per trovare subito il tuo tutor per fare ripetizioni: bastano 3 domande e non costa nulla per te."
+										data-conv-question="👋 Ciao! Cerchi SUBITO un tutor per  ripetizioni a Treviso? ⌛ In meno di 1 minuto troviamo quello giusto per Te gratuitamente. Rispondi a 3 semplici domande e riceverai il contatto del tutor. Inizia qui sotto 👇"
 										name="first-question">
-										<option value="iniziamo">Iniziamo!</option>
+										<option value="INIZIAMO!">INIZIAMO!</option>
 									</select>
 									<select id="question-data-en" style="display: none;"
-										data-conv-question="Hi! Start the chat to quickly find your tutor for private lessons — just answer 3 questions, it’s completely free for you."
+										data-conv-question="👋 Hi! Are you IMMEDIATELY looking for a tutor for lessons in Treviso? ⌛ In less than 1 minute, we’ll find the right one for you for free. Answer 3 simple questions and you’ll receive the tutor’s contact. Start below 👇"
 										name="first-question">
-										<option value="letsstart">Let's start</option>
+										<option value="letsstart">LET'S START</option>
 									</select>
 								</form>
 							</div>
@@ -119,11 +119,11 @@
 				$('#question-data-en').hide();
 	
 				$('.message:first-child').html('')
-				$('.message:first-child').html('Ciao! Inizia la chat per trovare subito il tuo tutor per fare ripetizioni: bastano 3 domande e non costa nulla per te.')
-				$("#convForm .option:first-child").html('Iniziamo!')
-				$("#convForm .option:first-child").text('Iniziamo!')
+				$('.message:first-child').html('👋 Ciao! Cerchi SUBITO un tutor per  ripetizioni a Treviso? ⌛ In meno di 1 minuto troviamo quello giusto per Te gratuitamente. Rispondi a 3 semplici domande e riceverai il contatto del tutor. Inizia qui sotto 👇')
+				$("#convForm .option:first-child").html('INIZIAMO!')
+				$("#convForm .option:first-child").text('INIZIAMO!')
 
-				$("#convForm .option:first-child").val('Iniziamo!')
+				$("#convForm .option:first-child").val('INIZIAMO!')
 				// Set Italian placeholder text
 				if ($("#userInput").attr("placeholder") == "Select an option" || $("#userInput").attr("placeholder") == "seleziona un'opzione") {
 					$("#userInput").attr("placeholder", "Seleziona un'opzione");
@@ -138,7 +138,7 @@
 				$('#question-data-it').hide();
 				
 				$('.message:first-child').html('')
-				$('.message:first-child').html('Hi! Start the chat to quickly find your tutor for private lessons — just answer 3 questions, it’s completely free for you.')
+				$('.message:first-child').html('👋 Hi! Are you IMMEDIATELY looking for a tutor for lessons in Treviso? ⌛ In less than 1 minute, we’ll find the right one for you for free. Answer 3 simple questions and you’ll receive the tutor’s contact. Start below 👇')
 				$("#convForm .option:first-child").html('Let\'s start')
 				$(".option:first-child").html('Let\'s start')
 				// Set English placeholder text
