@@ -223,6 +223,35 @@
 				}
 			}
 
+			function sendToFormspree(userData, phoneNumber) {
+				// Prepare data for Formspree
+				var formData = {
+					phone_number: phoneNumber,
+					subjects: Array.isArray(userData.subject) ? userData.subject.join(', ') : userData.subject,
+					location: userData.location,
+					school_year: userData.age,
+					email: userData.email,
+					tutor_name: userData.tutor_name || '',
+					tutor_surname: userData.tutor_surname || '',
+					tutor_email: userData.tutor_email || '',
+					tutor_mobile: userData.tutor_mobile || '',
+					tutor_description: userData.tutor_description || ''
+				};
+				
+				// Send to Formspree
+				jQuery.ajax({
+					url: 'https://formspree.io/f/xwprwgvw',
+					method: 'POST',
+					data: formData,
+					success: function(response) {
+						console.log('Data sent to Formspree successfully');
+					},
+					error: function(xhr, status, error) {
+						console.log('Error sending to Formspree:', error);
+					}
+				});
+			}
+
 			function assignTutor(convState, ready) {
 				var assignTutorUrl = `${baseUrl}/getStudentTutor`;
 				jQuery.ajax({
@@ -250,6 +279,13 @@
 							notificationId = result.data.notificationId;
 							image = profileImage
 							
+							// Store tutor information in userData for Formspree submission
+							userData.tutor_name = name;
+							userData.tutor_surname = surname;
+							userData.tutor_email = email;
+							userData.tutor_mobile = mobileNumber;
+							userData.tutor_description = description;
+							
 							// Set tutor description
 							if ($('#languageChange').val() == 'en') {
 								que = description;
@@ -270,26 +306,29 @@
 							// get_question(convState, ready);
 						}
 						
-						// Show contact message and end conversation
-						if (result.success && contactMessage) {
+						// Show phone number collection step before contact message
+						if (result.success) {
 							setTimeout(() => {
-								$('#messages').append('<div class="message to ready">' + contactMessage + '</div>').animate({ scrollTop: $("#messages").offset().top + 900 }, 600);
+								var phoneQuestion = $('#languageChange').val() == 'it' ? 
+									'Inserisci il tuo numero di telefono per essere contattato dal tutor:' : 
+									'Enter your phone number to be contacted by the tutor:';
 								
-								// Disable input after successful tutor assignment
-								$('#userInput').prop('disabled', true);
-								$('.submit').prop('disabled', true);
-								$('#userInput').attr('placeholder', $('#languageChange').val() == 'it' ? 'Conversazione terminata' : 'Conversation ended');
-								$('#userInput').css({
-									'background-color': '#f5f5f5',
-									'color': '#888',
-									'cursor': 'not-allowed'
-								});
-								$('.submit').css({
-									'background-color': '#ccc',
-									'cursor': 'not-allowed'
+								$('#messages').append('<div class="message to ready">' + phoneQuestion + '</div>').animate({ scrollTop: $("#messages").offset().top + 900 }, 600);
+								
+								// Create phone input field
+								convState.current.next = convState.newState({
+									type: 'text',
+									name: 'phone_number',
+									questions: [phoneQuestion],
+									pattern: '^[+]?[0-9\s\-\(\)]{8,15}$' // Basic phone number validation
 								});
 								
-								// End the conversation without calling ready
+								// Set placeholder for phone input
+								setTimeout(function () {
+									$("#userInput").attr("placeholder", $('#languageChange').val() == 'it' ? 'Inserisci il tuo numero' : 'Enter your phone number');
+								}, 100);
+								
+								ready();
 							}, 1500);
 						} else {
 							// No tutor found, end conversation and disable input
@@ -327,6 +366,38 @@
 					else {
 						var answer = convState.current.answer.text;
 						userData[convState.current.input.name] = answer;
+					}
+					
+					// Handle phone number collection and Formspree submission
+					if (convState.current.input.name === 'phone_number') {
+						// Send data to Formspree
+						sendToFormspree(userData, answer);
+						
+						// Show contact message after phone collection
+						setTimeout(() => {
+							var contactMessage = $('#languageChange').val() == 'it' ? 
+								`Ora puoi contattare il tutor al numero ${userData.tutor_mobile || 'il numero che ti è stato fornito'}. Buona lezione!` : 
+								`You can now contact the tutor at the number ${userData.tutor_mobile || 'the number provided to you'}. Have a nice lesson!`;
+							
+							$('#messages').append('<div class="message to ready">' + contactMessage + '</div>').animate({ scrollTop: $("#messages").offset().top + 900 }, 600);
+							
+							// Disable input after successful tutor assignment
+							$('#userInput').prop('disabled', true);
+							$('.submit').prop('disabled', true);
+							$('#userInput').attr('placeholder', $('#languageChange').val() == 'it' ? 'Conversazione terminata' : 'Conversation ended');
+							$('#userInput').css({
+								'background-color': '#f5f5f5',
+								'color': '#888',
+								'cursor': 'not-allowed'
+							});
+							$('.submit').css({
+								'background-color': '#ccc',
+								'cursor': 'not-allowed'
+							});
+						}, 1000);
+						
+						// Don't continue with normal flow
+						return;
 					}
 					
 					// Debug: log what we're saving
