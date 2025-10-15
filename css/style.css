@@ -23,10 +23,12 @@ h1 {
 
 /********* NAVBAR *********/ 
 .navbar {
+    height: 120px;
     font-family: 'Lato', sans-serif;
     font-style: italic;
     margin-top: 20px;
-    border-radius: 25px;
+    padding: .5rem 2rem;
+    border-radius: 50px !important;
     z-index: 100;
     -webkit-box-shadow: 1px 11px 29px -12px rgba(0,0,0,0.75);
     -moz-box-shadow: 1px 11px 29px -12px rgba(0,0,0,0.75);
@@ -46,9 +48,9 @@ h1 {
 
 .richiedi_tutor {
     background: linear-gradient(90deg, rgba(54,161,221,1) 0%, rgba(12,62,173,0.7799663597733711) 100%);
-    border-radius: 25px;
-    padding: 0.6em 3em;
-    font-size: 1.4em;
+    border-radius: 28px;
+    padding: 0.5em 2.8em;
+    font-size: 1.5em;
     color: #fff !important;
 }
 
@@ -283,8 +285,10 @@ footer a[style*="pointer-events: none"] {
 
 @media screen and (max-width: 768px) {
     .navbar {
-        margin-top: auto;
-        border-radius: 0;
+        /* margin-top: auto; */
+        /* border-radius: 0; */
+        height: 90px;
+        padding: .5rem 1rem;
     }
     
     .navbar-nav {
@@ -355,21 +359,22 @@ footer a[style*="pointer-events: none"] {
 @media screen and (max-width: 560px) {
     .richiedi_tutor {
         padding: 0.5em 1.7em;
-        border-radius: 22px;
+        border-radius: 28px;
     }
 }
 
 @media screen and (max-width: 480px) {
     .richiedi_tutor {
-        padding: 0.2em 1em;
-        border-radius: 17px;
-        font-size: auto;
+        padding: 0.4em 1em;
+        border-radius: 28px;
+        font-size: 1.3em;
     }
     .nav-item i {
         display: inline-block;
         font-size: 0.8em;
     }
     .slogan {
+        margin: auto;
         font-size: 2.8em;
         line-height: 50px;
     }
