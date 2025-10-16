@@ -157,7 +157,7 @@
 										<option value="INIZIAMO!">INIZIAMO!</option>
 									</select>
 									<select id="question-data-en" style="display: none;"
-										data-conv-question="Hi! In less than a minute, we'll find the right tutor for you for free. Answer 3 simple questions and you'll receive the tutor’s contact. Click below. 👇"
+										data-conv-question="Hi! In less than a minute, we'll find the right tutor for you for free. Answer 3 simple questions and you'll receive the tutor's contact. Click below. 👇"
 										name="first-question">
 										<option value="letsstart">LET'S START</option>
 									</select>
@@ -202,7 +202,7 @@
 				$('#question-data-it').hide();
 				
 				$('.message:first-child').html('')
-				$('.message:first-child').html('Hi! In less than a minute, we\'ll find the right tutor for you for free. Answer 3 simple questions and you\'ll receive the tutor’s contact. Click below. 👇')
+				$('.message:first-child').html('Hi! In less than a minute, we\'ll find the right tutor for you for free. Answer 3 simple questions and you\'ll receive the tutor\'s contact. Click below. 👇')
 				$("#convForm .option:first-child").html('Let\'s start')
 				$(".option:first-child").html('Let\'s start')
 				// Set English placeholder text
@@ -241,6 +241,9 @@
 
 			// Monitor subject selections to update placeholder
 			$(document).on('click', '.option', function() {
+				// Disable auto-click if user clicks manually
+				autoClickExecuted = true;
+				
 				// Check if we're in subject selection mode
 				if ($(this).closest('.conv-form-wrapper').find('input[name="subject"]').length > 0) {
 					setTimeout(function() {
@@ -265,6 +268,7 @@
 			// Initialize Italian language by default
 			setTimeout(function() {
 				$('#languageChange').val('it').trigger('change');
+				
 				// Ensure the placeholder is set to Italian on first load
 				setTimeout(function() {
 					if ($("#userInput").length && $("#userInput").attr("placeholder") === "Select an option") {
@@ -272,6 +276,29 @@
 					}
 				}, 100);
 			}, 500);
+
+			// Auto-click the "INIZIAMO!" button after convForm is fully loaded
+			var autoClickExecuted = false;
+			setTimeout(function() {
+				// Wait for the convForm to be fully rendered
+				var checkButton = setInterval(function() {
+					var button = $(".option").first();
+					if (button.length > 0 && button.is(':visible') && !autoClickExecuted) {
+						// Check if user has already interacted
+						if (!$('.message').length || $('.message').length === 1) {
+							clearInterval(checkButton);
+							button.click();
+							autoClickExecuted = true;
+							console.log('Auto-clicked the start button');
+						}
+					}
+				}, 20);
+				
+				// Stop trying after 1 second
+				setTimeout(function() {
+					clearInterval(checkButton);
+				}, 6000);
+			}, 6000);
 
 			function locationCheck() {
 				var checkLocationUrl = `${baseUrl}/getTutorsLocation`;
