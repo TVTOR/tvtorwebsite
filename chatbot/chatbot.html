@@ -29,6 +29,11 @@
 			margin-bottom: 15px !important;
 		}
 		
+		/* Adjust message positioning when dragscroll options are present */
+		div.conv-form-wrapper div.options.dragscroll ~ div#messages div.message.to {
+			margin-top: -10px !important;
+		}
+		
 		/* Ensure proper spacing during animations */
 		div.conv-form-wrapper div.message {
 			animation: slideTopFixed 0.15s ease;
@@ -62,6 +67,33 @@
 			margin-top: 10px;
 		}
 		
+		/* Custom styling for options dragscroll container - only for subject selection */
+		div.options.dragscroll.subject-selection {
+			height: 180px !important;
+			margin-top: 0 !important;
+		}
+		
+		/* Adjust message positioning when dragscroll options are present for subject selection */
+		div.conv-form-wrapper div.options.dragscroll.subject-selection ~ div#messages div.message.to {
+			margin-top: -10px !important;
+		}
+		
+		/* Increase padding-bottom for messages container during subject selection */
+		div#messages.subject-selection {
+			padding-bottom: 100px !important;
+		}
+		
+		/* Custom styling for options dragscroll container - only for location selection */
+		div.options.dragscroll.location-selection {
+			height: 110px !important;
+			margin-top: 0 !important;
+		}
+		
+		/* Increase padding-bottom for messages container during location selection */
+		div#messages.location-selection {
+			padding-bottom: 25px !important;
+		}
+		
 		/* Ensure no overflow CSS text appears */
 		body {
 			overflow-x: hidden;
@@ -76,6 +108,32 @@
 		.option {
 			font-weight: bold !important;
 			border-width: 3px !important;
+		}
+		
+		/* Mobile font size adjustments */
+		@media (max-width: 768px) {
+			/* Increase font size for messages on mobile */
+			div.conv-form-wrapper div.message {
+				font-size: 18px !important;
+				line-height: 1.4 !important;
+			}
+			
+			/* Increase font size for options on mobile */
+			div.conv-form-wrapper div.options .option {
+				font-size: 16px !important;
+				/* padding: 12px 16px !important; */
+			}
+			
+			/* Increase font size for input field on mobile */
+			div.conv-form-wrapper input[type="text"],
+			div.conv-form-wrapper textarea {
+				font-size: 16px !important;
+			}
+			
+			/* Increase font size for submit button on mobile */
+			div.conv-form-wrapper .submit {
+				font-size: 16px !important;
+			}
 		}
 	</style>
 </head>
@@ -94,12 +152,12 @@
 							<div id="chat">
 								<form action="" id="form-chatbot" method="GET" class="hidden">
 									<select id="question-data-it"
-										data-conv-question="👋 Ciao! Cerchi SUBITO un tutor per ripetizioni a Treviso? ⌛<br>In meno di 1 minuto troviamo quello giusto per Te gratuitamente.<br>Rispondi a 3 semplici domande e riceverai il contatto del tutor.<br>Clicca qui sotto 👇"
+										data-conv-question="Ciao! In meno di 1 minuto troviamo un tutor giusto per Te gratuitamente. Rispondi a 3 semplici domande e riceverai il contatto del tutor. 👇"
 										name="first-question">
 										<option value="INIZIAMO!">INIZIAMO!</option>
 									</select>
 									<select id="question-data-en" style="display: none;"
-										data-conv-question="👋 Hi! Are you URGENTLY looking for a tutor for lessons in Treviso? ⌛<br>In less than 1 minute we'll find the right one for you for free.<br>Answer 3 simple questions and you'll receive the tutor's contact.<br>Click below 👇"
+										data-conv-question="Hi! In less than a minute, we'll find the right tutor for you for free. Answer 3 simple questions and you'll receive the tutor’s contact. Click below. 👇"
 										name="first-question">
 										<option value="letsstart">LET'S START</option>
 									</select>
@@ -125,7 +183,7 @@
 				$('#question-data-en').hide();
 	
 				$('.message:first-child').html('')
-				$('.message:first-child').html('👋 Ciao! Cerchi SUBITO un tutor per ripetizioni a Treviso? ⌛<br>In meno di 1 minuto troviamo quello giusto per Te gratuitamente.<br>Rispondi a 3 semplici domande e riceverai il contatto del tutor.<br>Clicca qui sotto 👇')
+				$('.message:first-child').html('Ciao! In meno di 1 minuto troviamo un tutor giusto per Te gratuitamente. Rispondi a 3 semplici domande e riceverai il contatto del tutor. Clicca qui sotto 👇')
 				$("#convForm .option:first-child").html('INIZIAMO!')
 				$("#convForm .option:first-child").text('INIZIAMO!')
 
@@ -144,7 +202,7 @@
 				$('#question-data-it').hide();
 				
 				$('.message:first-child').html('')
-				$('.message:first-child').html('👋 Hi! Are you URGENTLY looking for a tutor for lessons in Treviso? ⌛<br>In less than 1 minute we\'ll find the right one for you for free.<br>Answer 3 simple questions and you\'ll receive the tutor\'s contact.<br>Click below 👇')
+				$('.message:first-child').html('Hi! In less than a minute, we\'ll find the right tutor for you for free. Answer 3 simple questions and you\'ll receive the tutor’s contact. Click below. 👇')
 				$("#convForm .option:first-child").html('Let\'s start')
 				$(".option:first-child").html('Let\'s start')
 				// Set English placeholder text
@@ -178,6 +236,29 @@
 							$("#chat").removeClass("danger");
 						}
 					}
+				}
+			});
+
+			// Monitor subject selections to update placeholder
+			$(document).on('click', '.option', function() {
+				// Check if we're in subject selection mode
+				if ($(this).closest('.conv-form-wrapper').find('input[name="subject"]').length > 0) {
+					setTimeout(function() {
+						// Count selected subjects
+						var selectedSubjects = $('.option.selected').length;
+						
+						if (selectedSubjects >= 2) {
+							// Remove placeholder when 2 subjects are selected
+							$("#userInput").attr("placeholder", "");
+						} else if (selectedSubjects === 1) {
+							// Show "Seleziona fino a 2 materie" when 1 is selected
+							if ($('#languageChange').val() == 'it') {
+								$("#userInput").attr("placeholder", "Seleziona fino a 2 materie");
+							} else {
+								$("#userInput").attr("placeholder", "Select up to 2 subjects");
+							}
+						}
+					}, 100);
 				}
 			});
 
@@ -516,12 +597,56 @@
 							var qData = result.data.data;
 							if (qData[0].type == "select" && qData[0].languageCode == "it") {
 								setTimeout(function () {
-									$("#userInput").attr("placeholder", "seleziona un'opzione");
+									// Check if this is the subject selection question
+									if (qData[0].title === 'subject') {
+										$("#userInput").attr("placeholder", "Seleziona fino a 2 materie");
+										// Add subject-selection class for custom styling
+										$("div.options.dragscroll").addClass("subject-selection");
+										$("#messages").addClass("subject-selection");
+										// Remove location-selection class
+										$("div.options.dragscroll").removeClass("location-selection");
+										$("#messages").removeClass("location-selection");
+									} else if (qData[0].title === 'location') {
+										$("#userInput").attr("placeholder", "seleziona un'opzione");
+										// Add location-selection class for custom styling
+										$("div.options.dragscroll").addClass("location-selection");
+										$("#messages").addClass("location-selection");
+										// Remove subject-selection class
+										$("div.options.dragscroll").removeClass("subject-selection");
+										$("#messages").removeClass("subject-selection");
+									} else {
+										$("#userInput").attr("placeholder", "seleziona un'opzione");
+										// Remove all custom classes for normal styling
+										$("div.options.dragscroll").removeClass("subject-selection location-selection");
+										$("#messages").removeClass("subject-selection location-selection");
+									}
 								}, 2000);
 							}
 							else if (qData[0].type == "select" && qData[0].languageCode == "en") {
 								setTimeout(function () {
-									$("#userInput").attr("placeholder", "Select an option");
+									// Check if this is the subject selection question
+									if (qData[0].title === 'subject') {
+										$("#userInput").attr("placeholder", "Select up to 2 subjects");
+										// Add subject-selection class for custom styling
+										$("div.options.dragscroll").addClass("subject-selection");
+										$("#messages").addClass("subject-selection");
+										// Remove location-selection class
+										$("div.options.dragscroll").removeClass("location-selection");
+										$("#messages").removeClass("location-selection");
+									} else if (qData[0].title === 'location') {
+										$("#userInput").attr("placeholder", "Select an option");
+										// Add location-selection class for custom styling
+										$("div.options.dragscroll").addClass("location-selection");
+										$("#messages").addClass("location-selection");
+										// Remove subject-selection class
+										$("div.options.dragscroll").removeClass("subject-selection");
+										$("#messages").removeClass("subject-selection");
+									} else {
+										$("#userInput").attr("placeholder", "Select an option");
+										// Remove all custom classes for normal styling
+										$("div.options.dragscroll").removeClass("subject-selection location-selection");
+										$("#messages").removeClass("subject-selection location-selection");
+									}
 								}, 2000);
 
 							}
