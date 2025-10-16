@@ -204,7 +204,7 @@ ConvState.prototype.printAnswers = function (answers, multiple) {
                         if ($("#userInput").attr("placeholder") == "Select an option" && $('#languageChange').val() == 'en') {
                             $("#userInput").attr("placeholder", "seleziona un'opzione");
                         } else {
-                            $("textarea#userInput").attr("placeholder", "Digita qui");
+                            $("textarea#userInput").attr("placeholder", "...");
 
                         }
                         if ($("#userInput").attr("placeholder") == "Select an option" && ('#languageChange').val() == 'en') {
@@ -212,16 +212,16 @@ ConvState.prototype.printAnswers = function (answers, multiple) {
                             $("#userInput").attr("placeholder", "Select an option");
                         } else {
                             setTimeout(function () {
-                                $("#userInput").attr("placeholder", "Digita qui");
+                                $("#userInput").attr("placeholder", "...");
                             }, 5);
-                            $("#userInput").attr("placeholder", "Digita qui");
+                            $("#userInput").attr("placeholder", "...");
 
                         }
                         if ($("#userInput").attr("placeholder") == "Select an option" && ('#languageChange').val() == 'it') {
                             setTimeout(function () {
-                                $("#userInput").attr("placeholder", "digfgdgfghfita qui");
+                                $("#userInput").attr("placeholder", "...");
                             }, 5);
-                            $("#userInput").attr("placeholder", "digidfgfgfta qui");
+                            $("#userInput").attr("placeholder", "...");
                         }
                         this.current.input.selected = $(event.target).data("answer").value;
                         this.wrapper.find(this.parameters.inputIdHashTagName).removeClass('error');
@@ -367,7 +367,7 @@ ConvState.prototype.updateSubjectCounter = function () {
         $(this).addClass('conv-form-wrapper');
 
         var parameters = $.extend(true, {}, {
-            placeHolder: 'Type Here',
+            placeHolder: '...',
             typeInputUi: 'textarea',
             timeOutFirstQuestion: 1200,
             buttonClassStyle: 'icon2-arrow',
@@ -448,7 +448,7 @@ ConvState.prototype.updateSubjectCounter = function () {
             var inputForm;
             parameters.inputIdHashTagName = '#' + parameters.inputIdName;
             if ($('#languageChange').val() == 'en') {
-                parameters.placeHolder = 'Type Here'
+                parameters.placeHolder = '...'
             } else {
                 parameters.placeHolder = "..."
             }

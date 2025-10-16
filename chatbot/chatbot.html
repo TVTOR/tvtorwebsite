@@ -192,7 +192,8 @@
 				if ($("#userInput").attr("placeholder") == "Select an option" || $("#userInput").attr("placeholder") == "seleziona un'opzione") {
 					$("#userInput").attr("placeholder", "Seleziona un'opzione");
 				} else {
-					$("textarea#userInput").attr("placeholder", "Digita qui");
+					// During loading/transitions, show "..." instead of "digita qui"
+					$("textarea#userInput").attr("placeholder", "...");
 				}
 				$(".submit").html('invia');
 
@@ -209,7 +210,8 @@
 				if ($("#userInput").attr("placeholder") == "seleziona un'opzione" || $("#userInput").attr("placeholder") == "Select an option") {
 					$("#userInput").attr("placeholder", "Select an option");
 				} else {
-					$("textarea#userInput").attr("placeholder", "Type here");
+					// During loading/transitions, show "..." instead of "Type Here"
+					$("textarea#userInput").attr("placeholder", "...");
 				}
 				$(".submit").html('Send');
 			}
@@ -679,13 +681,23 @@
 							}
 							else if (qData[0].type == "text" && qData[0].languageCode == "en") {
 								setTimeout(function () {
-									$("#userInput").attr("placeholder", "Type Here");
+									// Only show "Type Here" for age question, otherwise show "..."
+									if (qData[0].title === 'age') {
+										$("#userInput").attr("placeholder", "Type Here");
+									} else {
+										$("#userInput").attr("placeholder", "...");
+									}
 								}, 5);
 
 							}
 							else if (qData[0].type == "text" && qData[0].languageCode == "it") {
 								setTimeout(function () {
-									$("#userInput").attr("placeholder", "digita qui");
+									// Only show "digita qui" for age question, otherwise show "..."
+									if (qData[0].title === 'age') {
+										$("#userInput").attr("placeholder", "digita qui");
+									} else {
+										$("#userInput").attr("placeholder", "...");
+									}
 								}, 5);
 							} else if (qData[0].title == "contacting_tutor" && qData[0].languageCode == "it") {
 								setTimeout(function () {
