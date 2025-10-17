@@ -165,16 +165,23 @@ div.conv-form-wrapper:before {
 }
 
 .image_size {
-	max-width: 90% !important;
+	/* max-width: 90% !important; */
+    width: 320px !important;
+    max-width: 320px !important;
 }
 .image_size img {
     float: left;
-    padding-right: 10px;
+    /* padding-right: 15px; */
+    border-radius: 20px;
+    object-fit: cover;
+    width: 180px;
+    height: 180px;
 }
 
 .image_size figcaption {
     float: left;
-    max-width: 70%;
+    /* max-width: 65%; */
+    margin-top: 5px;
 }
 
 .danger .options.dragscroll {
