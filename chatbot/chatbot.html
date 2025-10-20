@@ -192,13 +192,13 @@
 				$("#convForm .option:first-child").text('INIZIAMO!')
 
 				$("#convForm .option:first-child").val('INIZIAMO!')
-				// Set Italian placeholder text
-				if ($("#userInput").attr("placeholder") == "Select an option" || $("#userInput").attr("placeholder") == "seleziona un'opzione") {
-					$("#userInput").attr("placeholder", "Seleziona un'opzione");
-				} else {
-					// During loading/transitions, show "..." instead of "digita qui"
-					$("textarea#userInput").attr("placeholder", "...");
-				}
+					// Set Italian placeholder text
+					if ($("#userInput").attr("placeholder") == "Select an option" || $("#userInput").attr("placeholder") == "seleziona un'opzione") {
+						$("#userInput").attr("placeholder", "Seleziona un'opzione");
+					} else {
+						// Durante transizioni non mostrare alcun testo
+						$("textarea#userInput").attr("placeholder", "");
+					}
 				$(".submit").html('invia');
 
 			} else {
@@ -210,13 +210,13 @@
 				$('.message:first-child').html('Hi! In less than a minute, we\'ll find the right tutor for you for free. Answer 3 simple questions and you\'ll receive the tutor\'s contact. Click below. 👇')
 				$("#convForm .option:first-child").html('Let\'s start')
 				$(".option:first-child").html('Let\'s start')
-				// Set English placeholder text
-				if ($("#userInput").attr("placeholder") == "seleziona un'opzione" || $("#userInput").attr("placeholder") == "Select an option") {
-					$("#userInput").attr("placeholder", "Select an option");
-				} else {
-					// During loading/transitions, show "..." instead of "Type Here"
-					$("textarea#userInput").attr("placeholder", "...");
-				}
+					// Set English placeholder text
+					if ($("#userInput").attr("placeholder") == "seleziona un'opzione" || $("#userInput").attr("placeholder") == "Select an option") {
+						$("#userInput").attr("placeholder", "Select an option");
+					} else {
+						// During loading/transitions, show nothing
+						$("textarea#userInput").attr("placeholder", "");
+					}
 				$(".submit").html('Send');
 			}
 		});
@@ -555,12 +555,7 @@
 							}
 						});
 						
-						// Show processing message
-						var processingMessage = $('#languageChange').val() == 'it' ? 
-							'Grazie! Stiamo cercando il miglior tutor per te. Attendi per favore...' : 
-							'Thank you! We\'re finding the best tutor for you. Please wait...';
-						
-						$('#messages').append('<div class="message to ready">' + processingMessage + '</div>').animate({ scrollTop: $("#messages").offset().top + 600 }, 600);
+						// Removed processing/loading message to avoid showing any loading text
 						
 						// Start tutor assignment process immediately
 						setTimeout(() => {
@@ -580,6 +575,16 @@
 							// If no tutor assignment after 30 seconds, show timeout message
 							if (isAssignTutor) {
 								isAssignTutor = false;
+								// Remove any typing/loading indicators (three dots) before showing timeout
+								try {
+									$('#messages .message').each(function() {
+										var $m = $(this);
+										var txt = ($m.text() || '').trim();
+										if (txt === '...' || $m.hasClass('typing') || $m.hasClass('loading')) {
+											$m.remove();
+										}
+									});
+								} catch (e) { /* no-op */ }
 								var timeoutMessage = $('#languageChange').val() == 'it' ? 
 									'Non ci sono tutor disponibili al momento. Scrivici al +39 3485804824!' : 
 									'No tutors are available right now. Contact us at +393485804824!';
@@ -600,7 +605,7 @@
 									'cursor': 'not-allowed'
 								});
 							}
-						}, 30000); // 30 seconds timeout
+						}, 45000); // 45 seconds timeout
 						
 						// Don't call ready() - this prevents the chatbot from continuing to look for questions
 						return;
@@ -685,22 +690,22 @@
 							}
 							else if (qData[0].type == "text" && qData[0].languageCode == "en") {
 								setTimeout(function () {
-									// Only show "Type Here" for age question, otherwise show "..."
+									// Only show "Type Here" for age question, otherwise show nothing
 									if (qData[0].title === 'age') {
 										$("#userInput").attr("placeholder", "Type Here");
 									} else {
-										$("#userInput").attr("placeholder", "...");
+										$("#userInput").attr("placeholder", "");
 									}
 								}, 5);
 
 							}
 							else if (qData[0].type == "text" && qData[0].languageCode == "it") {
 								setTimeout(function () {
-									// Only show "digita qui" for age question, otherwise show "..."
+									// Only show "digita qui" for age question, otherwise show nothing
 									if (qData[0].title === 'age') {
 										$("#userInput").attr("placeholder", "digita qui");
 									} else {
-										$("#userInput").attr("placeholder", "...");
+										$("#userInput").attr("placeholder", "");
 									}
 								}, 5);
 							} else if (qData[0].title == "contacting_tutor" && qData[0].languageCode == "it") {
@@ -711,10 +716,17 @@
 
 							var pattern = '';
 							for (var i = 0; i < qData.length; i++) {
-								if (qData[i].title == 'email') {
+							if (qData[i].title == 'email') {
 									pattern = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$";
 								}
-								newQuestion = qData[i].question;
+
+							// Skip any phone/number request coming from backend; collect it only AFTER tutor info
+							var questionTitleLower = (qData[i].title || '').toLowerCase();
+							if (questionTitleLower === 'mobilenumber' || questionTitleLower === 'phone_number' || questionTitleLower === 'phone' || questionTitleLower === 'telefono' || questionTitleLower === 'numero') {
+								continue;
+							}
+
+							newQuestion = qData[i].question;
 								count = qData[i].question_num;
 								var questionTitle = qData[i].title;
 								newQuestion = newQuestion.replace("{name}", answer);
