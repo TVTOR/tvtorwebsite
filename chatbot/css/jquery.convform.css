@@ -247,6 +247,12 @@ div.conv-form-wrapper div#messages {
     padding-bottom: 20px;
     /*max-height: 71vh;*/
 }
+/* When there are no options to select, don't pin messages to the bottom */
+div.conv-form-wrapper:not(:has(div.options .option)) div#messages {
+    position: static;
+    bottom: auto;
+    padding-bottom: 0;
+}
 div.conv-form-wrapper div.options {
     word-wrap: normal;
     white-space: normal;

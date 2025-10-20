@@ -85,8 +85,12 @@
 		
 		/* Custom styling for options dragscroll container - only for location selection */
 		div.options.dragscroll.location-selection {
-			height: 110px !important;
+			height: 0 !important;
 			margin-top: 0 !important;
+		}
+		/* Expand location options only when there are option items */
+		div.options.dragscroll.location-selection:has(.option) {
+			height: 110px !important;
 		}
 		
 		/* Increase padding-bottom for messages container during location selection */
