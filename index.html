@@ -59,6 +59,12 @@
 
         <script>
             let chatWidgetOpen = false;
+            
+            // Function to detect if device is mobile
+            function isMobileDevice() {
+                return window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            }
+            
             function toggleChatWidget() {
                 if (chatWidgetOpen) {
                     closeChatWidget();
@@ -98,6 +104,16 @@
             }
             document.addEventListener('keydown', function(event) {
                 if (event.key === 'Escape' && chatWidgetOpen) closeChatWidget();
+            });
+            
+            // Auto-open chat widget on desktop devices only
+            document.addEventListener('DOMContentLoaded', function() {
+                // Small delay to ensure page is fully loaded
+                setTimeout(function() {
+                    if (!isMobileDevice() && !chatWidgetOpen) {
+                        openChatWidget();
+                    }
+                }, 2000); // 2 second delay to allow page to fully load
             });
         </script>
 
@@ -252,7 +268,7 @@
                 <div class="row cards">
                     <div class="pas1 col-lg-4 col-md-4 col-xs-12 text-center">
                         <h3><span class="badge">1</span><br></h3>
-                        <img src="media/pas1.png">
+                        <img src="media/pas1.png" onclick="openChatWidget()" style="cursor: pointer;">
                         <h3>Clicca su "richiedi tutor"</h3>
                         <p>Avvia una chat per iniziare la ricerca di un tutor</p>
                     </div>
