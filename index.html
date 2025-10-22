@@ -106,14 +106,18 @@
                 if (event.key === 'Escape' && chatWidgetOpen) closeChatWidget();
             });
             
-            // Auto-open chat widget on desktop devices only
+            // Auto-open chat widget on desktop devices
             document.addEventListener('DOMContentLoaded', function() {
-                // Small delay to ensure page is fully loaded
-                setTimeout(function() {
-                    if (!isMobileDevice() && !chatWidgetOpen) {
-                        openChatWidget();
-                    }
-                }, 2000); // 2 second delay to allow page to fully load
+                // Redirect mobile users to chatbot page
+                if (isMobileDevice()) {
+                    window.location.href = 'chatbot/chatbot.html';
+                    return;
+                }
+                
+                // For desktop, open the widget
+                if (!chatWidgetOpen) {
+                    openChatWidget();
+                }
             });
         </script>
 
@@ -203,10 +207,10 @@
         <div id="chat-widget-container">
             <div id="chat-widget-overlay" onclick="closeChatWidget()"></div>
             <div id="chat-widget-popup">
-                <div class="chat-widget-header">
+                <!-- <div class="chat-widget-header">
                     <h3>TVTOR - Trova il tuo tutor</h3>
                     <button class="chat-widget-close" onclick="closeChatWidget()">&times;</button>
-                </div>
+                </div> -->
                 <div class="chat-widget-body">
                     <iframe src="" class="chat-widget-iframe" id="chat-iframe"></iframe>
                 </div>

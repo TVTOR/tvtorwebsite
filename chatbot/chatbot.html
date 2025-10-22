@@ -6,6 +6,20 @@
     <meta charset="UTF-8">
     <meta name="viewport"
           content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1">
+    
+    <!-- Instant mobile redirect - must be at the very top -->
+    <script>
+        // Redirect to full chatbot page if accessed from mobile and not already in iframe
+        if (window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+            // Check if we're in an iframe (desktop widget) or direct access (mobile redirect)
+            if (window === window.top) {
+                // We're not in an iframe, so this is a direct mobile access - stay here
+                // This is the final destination for mobile users
+            } else {
+                // We're in an iframe on desktop, don't redirect
+            }
+        }
+    </script>
     <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="css/jquery.convform.css">
     <link rel="stylesheet"
@@ -117,8 +131,81 @@
            border-width: 3px !important;
         }
 
+        /* Mobile header styles */
+        .mobile-header {
+            display: none;
+            background: linear-gradient(135deg, #007AFF 0%, #0051D5 100%);
+            color: white;
+            padding: 16px 20px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .mobile-header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .mobile-header h3 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 400;
+            font-style: italic;
+        }
+        
+        .mobile-header-logo {
+            height: 30px;
+            margin-right: 10px;
+        }
+        
+        .mobile-header-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+        
+        .mobile-header-close:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        
         /* Mobile font size adjustments */
         @media (max-width: 768px) {
+           .mobile-header {
+               display: block;
+           }
+           
+           /* Add top padding to body to account for fixed header */
+           body {
+               padding-top: 70px;
+           }
+           
+           /* Move language selector down on mobile */
+           #languageChange {
+               top: 83px !important;
+           }
+           
+           /* Set minimum height for demo section on mobile */
+           section#demo {
+               min-height: 84vh;
+           }
+           
+           /* Add margin top to first message on mobile */
+           div.conv-form-wrapper div.message.to.ready:first-child {
+               margin-top: 130px !important;
+           }
+           
            /* Increase font size for messages on mobile */
            div.conv-form-wrapper div.message {
               font-size: 18px !important;
@@ -148,9 +235,20 @@
 </head>
 
 <body>
+<!-- Mobile Header -->
+<div class="mobile-header">
+    <div class="mobile-header-content">
+        <div style="display: flex; align-items: center;">
+            <img src="../media/logo_trim.png" alt="TVTOR" class="mobile-header-logo">
+            <h3>TVTOR - Trova il tuo tutor a Treviso</h3>
+        </div>
+        <button class="mobile-header-close" onclick="window.location.href='../index.html'">&times;</button>
+    </div>
+</div>
+
 <select name="" id="languageChange">
     <option value="en">English</option>
-    <option value="it" selected>Italian</option>
+    <option value="it" selected>Italiano</option>
 </select>
 <section id="demo">
     <div class="vertical-align">
@@ -161,7 +259,7 @@
                         <div id="chat">
                             <form action="" id="form-chatbot" method="GET" class="hidden">
                                 <select id="question-data-it"
-                                        data-conv-question="Ciao! In meno di 1 minuto troviamo un tutor giusto per Te gratuitamente. Rispondi a 3 semplici domande e riceverai il contatto del tutor. 👇"
+                                        data-conv-question="Ciao! 👋 In meno di 1 minuto troviamo un tutor giusto per Te gratuitamente. 🎓 Rispondi a 3 semplici domande e riceverai il contatto del tutor. 👇"
                                         name="first-question">
                                     <option value="INIZIAMO!">INIZIAMO!</option>
                                 </select>
@@ -189,7 +287,7 @@
           $('#question-data-en').hide();
 
           $('.message:first-child').html('')
-          $('.message:first-child').html('Ciao! In meno di 1 minuto troviamo un tutor giusto per Te gratuitamente. Rispondi a 3 semplici domande e riceverai il contatto del tutor. Clicca qui sotto 👇')
+          $('.message:first-child').html('Ciao! 👋 In meno di 1 minuto troviamo un tutor giusto per Te gratuitamente. 🎓 Rispondi a 3 semplici domande e riceverai il contatto del tutor. Clicca qui sotto 👇')
           $("#convForm .option:first-child").html('INIZIAMO!')
           $("#convForm .option:first-child").text('INIZIAMO!')
 
