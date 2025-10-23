@@ -1,39 +1,81 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="it">
 <head>
-    <title>convForm - example</title>
+    <title>TVTOR - Trova il tuo tutor</title>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1">
 
-    <!-- Instant mobile redirect - must be at the very top -->
-    <script>
-        // Redirect to full chatbot page if accessed from mobile and not already in iframe
-        if (window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-            // Check if we're in an iframe (desktop widget) or direct access (mobile redirect)
-            if (window === window.top) {
-                // We're not in an iframe, so this is a direct mobile access - stay here
-                // This is the final destination for mobile users
-            } else {
-                // We're in an iframe on desktop, don't redirect
-            }
-        }
-    </script>
     <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="css/jquery.convform.css">
-    <link rel="stylesheet"
-          href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
-          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
-          crossorigin="anonymous">
-    <link rel="stylesheet" type="text/css" href="css/demo.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="css/styles.css">
 
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: 'Roboto', sans-serif; background: #f5f5f5; margin: 0; padding: 0; }
 
+        .mobile-header { display: none; background: #fff; padding: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); position: fixed; top: 0; width: 100%; z-index: 1000; }
+        .mobile-header-content { display: flex; justify-content: space-between; align-items: center; }
+        .mobile-header-logo { width: 40px; height: 40px; margin-right: 10px; }
+        .mobile-header-close { background: none; border: none; font-size: 30px; cursor: pointer; }
+
+        #languageChange {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 6px 12px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            background: white;
+            z-index: 100;
+            font-size: 13px;
+            min-width: 80px;
+            cursor: pointer;
+        }
+
+        .chat-container { max-width: 600px; margin: 50px auto; background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); height: 600px; display: flex; flex-direction: column; }
+        .messages-container { flex: 1; overflow-y: auto; padding: 20px; scroll-behavior: smooth; }
+
+        .message { margin-bottom: 15px; animation: fadeIn 0.3s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .message.bot { text-align: left; }
+        .message.user { text-align: right; }
+
+        .message-bubble { display: inline-block; padding: 12px 18px; border-radius: 18px; max-width: 70%; word-wrap: break-word; }
+        .message.bot .message-bubble { background: #e9ecef; color: #333; }
+        .message.user .message-bubble { background: #007bff; color: white; }
+
+        .message.typing .message-bubble { background: #e9ecef; padding: 12px 20px; }
+        .typing-indicator { display: inline-flex; gap: 4px; }
+        .typing-indicator span { width: 8px; height: 8px; background: #999; border-radius: 50%; animation: typing 1.4s infinite; }
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes typing { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-10px); } }
+
+        .options-container { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; justify-content: flex-start; }
+        .option-button { padding: 10px 20px; background: white; border: 2px solid #007bff; color: #007bff; border-radius: 20px; cursor: pointer; transition: all 0.3s; font-size: 14px; }
+        .option-button:hover, .option-button.selected { background: #007bff; color: white; }
+        .option-button.disabled { opacity: 0.5; pointer-events: none; }
+
+        .tutor-card { background: white; border: 1px solid #ddd; border-radius: 10px; padding: 15px; margin: 10px 0; text-align: center; }
+        .tutor-card img { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; margin-bottom: 10px; }
+
+        .input-container { padding: 15px; border-top: 1px solid #ddd; display: flex; gap: 10px; }
+        #userInput { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 25px; font-size: 14px; outline: none; }
+        #userInput:focus { border-color: #007bff; }
+        #sendButton { padding: 12px 25px; background: #007bff; color: white; border: none; border-radius: 25px; cursor: pointer; font-weight: bold; transition: background 0.3s; }
+        #sendButton:hover { background: #0056b3; }
+        #sendButton:disabled { background: #ccc; cursor: not-allowed; }
+
+        .subject-selection .options-container { max-height: 300px; overflow-y: auto; }
+
+        @media (max-width: 768px) {
+            .mobile-header { display: block; }
+            .chat-container { margin: 80px 10px 10px; height: calc(100vh - 100px); }
+            #languageChange { top: 80px; left: 15px; }
+        }
+    </style>
 </head>
-
 <body>
-<!-- Mobile Header -->
 <div class="mobile-header">
     <div class="mobile-header-content">
         <div style="display: flex; align-items: center;">
@@ -45,41 +87,634 @@
 </div>
 
 <select name="" id="languageChange">
-    <option value="en">English</option>
-    <option value="it" selected>Italiano</option>
+    <option value="it" selected>🇮🇹 IT</option>
+    <option value="en">🇬🇧 EN</option>
 </select>
-<section id="demo">
-    <div class="vertical-align">
-        <div class="container">
-            <div class="row">
-                <div class="col-sm-6 col-sm-offset-3 col-xs-offset-0">
-                    <div class="card no-border">
-                        <div id="chat">
-                            <form action="" id="form-chatbot" method="GET" class="hidden">
-                                <select id="question-data-it"
-                                        data-conv-question="Ciao! 👋 In meno di 1 minuto troviamo un tutor giusto per Te gratuitamente. 🎓 Rispondi a 3 semplici domande e riceverai il contatto del tutor. 👇"
-                                        name="first-question">
-                                    <option value="INIZIAMO!">INIZIAMO!</option>
-                                </select>
-                                <select id="question-data-en" style="display: none;"
-                                        data-conv-question="Hi! In less than a minute, we'll find the right tutor for you for free. Answer 3 simple questions and you'll receive the tutor's contact. Click below. 👇"
-                                        name="first-question">
-                                    <option value="letsstart">LET'S START</option>
-                                </select>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+
+<div class="chat-container">
+    <div class="messages-container" id="messagesContainer"></div>
+    <div class="input-container">
+        <input type="text" id="userInput" placeholder="..." disabled>
+        <button id="sendButton" disabled>Invia</button>
     </div>
-</section>
-<script type="text/javascript" src="js/jquery-1.12.3.min.js"></script>
-<script type="text/javascript" src="js/autosize.min.js"></script>
-<script type="text/javascript" src="js/jquery.convform.js"></script>
-<script type="text/javascript" src="js/app.js"></script>
+</div>
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    const baseUrl = 'https://tvtorbackend.onrender.com/api/v1';
+    let userData = {};
+    let isAssignTutor = true;
+    let isAssignTutor_check = true;
+    let setIntervalTime;
+    let count = 3;
+    let notificationId = "";
+    let isFetching = false;
+    let currentQuestionId = null;
+    let lastQuestionTitle = null;
+    let currentLang = 'it';
+    let notificationSent = false;
+    let questionsCompleted = false;
+
+    const messages = {
+        it: {
+            welcome: "Ciao! 👋 In meno di 1 minuto troviamo un tutor giusto per Te gratuitamente. 🎓 Rispondi a 3 semplici domande e riceverai il contatto del tutor. 👇",
+            processing: "Grazie! Stiamo cercando il miglior tutor per te. Attendi per favore...",
+            noTutor: "Non ci sono tutor disponibili al momento. Scrivici al +39 3485804824!",
+            phoneQuestion: "Inserisci il tuo numero di telefono per essere contattato dal tutor:",
+            contactMessage: "Ora puoi contattare il tutor al numero {phone}. Buona lezione!",
+            conversationEnded: "Conversazione terminata",
+            selectUpTo2: "Seleziona fino a 2 materie",
+            selectOption: "seleziona un'opzione",
+            typeHere: "digita qui",
+            send: "Invia"
+        },
+        en: {
+            welcome: "Hi! 👋 In less than a minute, we'll find the right tutor for you for free. 🎓 Answer 3 simple questions and you'll receive the tutor's contact. 👇",
+            processing: "Thank you! We're finding the best tutor for you. Please wait...",
+            noTutor: "No tutors are available right now. Contact us at +393485804824!",
+            phoneQuestion: "Enter your phone number to be contacted by the tutor:",
+            contactMessage: "You can now contact the tutor at the number {phone}. Have a nice lesson!",
+            conversationEnded: "Conversation ended",
+            selectUpTo2: "Select up to 2 subjects",
+            selectOption: "Select an option",
+            typeHere: "Type here",
+            send: "Send"
+        }
+    };
+
+    function getLangText(key){ return messages[currentLang][key] || key; }
+
+    function scrollToBottom(){
+        const c = document.getElementById('messagesContainer');
+        c.scrollTop = c.scrollHeight;
+    }
+
+    function addMessage(text, type = 'bot', isHTML = false) {
+        const messagesContainer = document.getElementById('messagesContainer');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${type}`;
+
+        const bubbleDiv = document.createElement('div');
+        bubbleDiv.className = 'message-bubble';
+
+        if (isHTML) bubbleDiv.innerHTML = text;
+        else bubbleDiv.textContent = text;
+
+        messageDiv.appendChild(bubbleDiv);
+        messagesContainer.appendChild(messageDiv);
+        scrollToBottom();
+        return messageDiv;
+    }
+
+    function addBotMessage(text){ return addMessage(text, 'bot', false); }
+    function addUserMessage(text){ return addMessage(text, 'user', false); }
+
+    function addTypingIndicator() {
+        removeTypingIndicator();
+        const messagesContainer = document.getElementById('messagesContainer');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'message bot typing';
+        messageDiv.id = 'typingIndicator';
+
+        const bubbleDiv = document.createElement('div');
+        bubbleDiv.className = 'message-bubble';
+        bubbleDiv.innerHTML = '<div class="typing-indicator"><span></span><span></span><span></span></div>';
+
+        messageDiv.appendChild(bubbleDiv);
+        messagesContainer.appendChild(messageDiv);
+        scrollToBottom();
+    }
+
+    function removeTypingIndicator() {
+        const n = document.getElementById('typingIndicator');
+        if (n) n.remove();
+    }
+
+    function removeTypingAndLoading(){
+        removeTypingIndicator();
+        document.querySelectorAll('#messagesContainer .message').forEach(n=>{
+            const txt = (n.textContent || '').trim();
+            if (n.classList.contains('typing') || n.classList.contains('loading') || txt === '...') {
+                n.remove();
+            }
+        });
+    }
+
+    function disableInput(){
+        const input = document.getElementById('userInput');
+        const btn = document.getElementById('sendButton');
+        input.disabled = true;
+        btn.disabled = true;
+    }
+
+    function enableTextInput(questionName) {
+        lastQuestionTitle = questionName || lastQuestionTitle;
+
+        const userInput = document.getElementById('userInput');
+        const sendButton = document.getElementById('sendButton');
+
+        userInput.disabled = false;
+        sendButton.disabled = false;
+        setTimeout(()=>userInput.focus(), 50);
+
+        if (questionName === 'age') {
+            userInput.placeholder = currentLang === 'it' ? 'digita qui' : 'Type here';
+        } else if (questionName === 'phone_number') {
+            userInput.placeholder = currentLang === 'it' ? 'Inserisci il tuo numero' : 'Enter your phone number';
+        } else {
+            userInput.placeholder = '...';
+        }
+    }
+
+    function enableInputFor(q){
+        if (q.type === 'text') enableTextInput(q.title || '');
+        else disableInput();
+    }
+
+    function applyPlaceholderHints(qData){
+        const q = qData[0];
+        const input = document.getElementById('userInput');
+        if (q.type === 'select') {
+            if (q.title === 'subject') {
+                input.placeholder = currentLang === 'it' ? 'Seleziona fino a 2 materie' : 'Select up to 2 subjects';
+            } else {
+                input.placeholder = currentLang === 'it' ? "seleziona un'opzione" : 'Select an option';
+            }
+        } else {
+            if (q.title === 'age') {
+                input.placeholder = currentLang === 'it' ? 'digita qui' : 'Type here';
+            } else {
+                input.placeholder = '...';
+            }
+        }
+    }
+
+    function addOptions(options, { multiple = false, name = '' } = {}) {
+        document.getElementById('currentOptions')?.remove();
+
+        const wrap = document.createElement('div');
+        wrap.id = 'currentOptions';
+        wrap.className = 'options-container';
+
+        options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'option-button';
+            btn.textContent = opt.text || opt.label || opt;
+            btn.dataset.value = opt.value || opt.text || opt;
+
+            if (!multiple) {
+                btn.addEventListener('click', async () => {
+                    if (isFetching) return;
+                    addUserMessage(btn.textContent);
+                    userData[name] = btn.dataset.value;
+                    wrap.remove();
+
+                    if (userData.age && userData.subject && userData.location) {
+                        startTutorSearch();
+                        return;
+                    }
+                    await fetchNextQuestion();
+                }, { once: true });
+            } else {
+                btn.addEventListener('click', async () => {
+                    btn.classList.toggle('selected');
+                    const selected = [...wrap.querySelectorAll('.option-button.selected')].map(b => b.dataset.value);
+                    userData[name] = selected;
+
+                    const input = document.getElementById('userInput');
+                    if (selected.length >= 2) {
+                        input.placeholder = "";
+                        if (isFetching) return;
+                        addUserMessage([...wrap.querySelectorAll('.option-button.selected')].map(b=>b.textContent).join(', '));
+                        wrap.remove();
+
+                        if (userData.age && userData.location) {
+                            startTutorSearch();
+                            return;
+                        }
+                        await fetchNextQuestion();
+                    } else if (selected.length === 1) {
+                        input.placeholder = currentLang === 'it' ? 'Seleziona fino a 2 materie' : 'Select up to 2 subjects';
+                    }
+                });
+            }
+
+            wrap.appendChild(btn);
+        });
+
+        document.getElementById('messagesContainer').appendChild(wrap);
+        scrollToBottom();
+    }
+
+    async function handleTextSubmit() {
+        if (isFetching) return;
+        const input = document.getElementById('userInput');
+        const val = (input.value || '').trim();
+        if (!val) return;
+
+        addUserMessage(val);
+
+        if (lastQuestionTitle) {
+            userData[lastQuestionTitle] = val;
+        }
+
+        if (lastQuestionTitle === 'phone_number') {
+            sendToFormspree(userData, val);
+            input.value = '';
+            endConversationUI();
+            return;
+        }
+
+        input.value = '';
+
+        if (userData.age && userData.subject && userData.location) {
+            startTutorSearch();
+            return;
+        }
+
+        await fetchNextQuestion();
+    }
+
+    async function fetchNextQuestion() {
+        if (questionsCompleted) {
+            console.log('Questions already completed, skipping fetch');
+            return;
+        }
+
+        if (isFetching) return;
+        isFetching = true;
+        disableInput();
+
+        try {
+            removeTypingAndLoading();
+            document.getElementById('currentOptions')?.remove();
+
+            // Genera email quando serve
+            if (userData.age && userData.subject && !userData.email) {
+                const n = Date.now();
+                userData.email = `${n}student@gmail.com`;
+            }
+
+            // Se abbiamo tutti i dati, NON chiamare API ma vai dritto alla ricerca tutor
+            if (userData.age && userData.subject && userData.location) {
+                console.log('All data collected, starting tutor search directly');
+                isFetching = false;
+                startTutorSearch();
+                return;
+            }
+
+            const payload = {
+                language: currentLang,
+                question: count,
+                email: userData.email,
+                subject: userData.subject,
+                location: userData.location,
+                mobilenumber: userData.mobilenumber,
+                age: userData.age,
+                website: userData.website,
+                notificationId: notificationId
+            };
+
+            const res = await fetch(`${baseUrl}/question`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (!res.ok) {
+                throw new Error(`HTTP ${res.status}`);
+            }
+
+            const result = await res.json();
+            const qData = (result?.data?.data) || [];
+
+            if (!qData.length) {
+                enableTextInput();
+                isFetching = false;
+                return;
+            }
+
+            const qKey = `${qData[0].question_num}::${qData[0].title || ''}`;
+            if (currentQuestionId === qKey) {
+                enableInputFor(qData[0]);
+                isFetching = false;
+                return;
+            }
+            currentQuestionId = qKey;
+
+            const titleLower = (qData[0].title || '').toLowerCase();
+            if (['mobilenumber','phone_number','phone','telefono','numero'].some(k => titleLower.includes(k))) {
+                isFetching = false;
+                return fetchNextQuestion();
+            }
+
+            renderQuestion(qData);
+            applyPlaceholderHints(qData);
+
+            count = qData[0].question_num + 1;
+            enableInputFor(qData[0]);
+
+        } catch (e) {
+            console.error('fetchNextQuestion error', e);
+            addBotMessage(currentLang === 'it' ? 'Errore temporaneo. Riprova.' : 'Temporary error. Please try again.');
+        } finally {
+            isFetching = false;
+        }
+    }
+
+    function renderQuestion(qData) {
+        const q = qData[0];
+        lastQuestionTitle = q.title || null;
+
+        addBotMessage(q.question);
+
+        if (q.type === 'select') {
+            const multiple = (q.title === 'subject');
+            addOptions(q.options || [], { multiple, name: q.title });
+        } else {
+            enableTextInput(q.title || '');
+        }
+    }
+
+    function sendNotification(type) {
+        if (!notificationId) {
+            console.log('No notificationId yet, skipping notification:', type);
+            return;
+        }
+
+        $.ajax({
+            url: `${baseUrl}/sendNotification`,
+            method: 'POST',
+            data: {
+                notificationId: notificationId,
+                type: type,
+                studentEmail: userData.email,
+                tutorEmail: userData.tutor_email || '',
+                language: currentLang
+            },
+            success: function() {
+                console.log('Notification sent successfully:', type);
+            },
+            error: function(err) {
+                console.error('Notification error:', err);
+            }
+        });
+    }
+
+    function startTutorSearch() {
+        console.log('=== START TUTOR SEARCH ===');
+        console.log('userData.email:', userData.email);
+        console.log('isAssignTutor:', isAssignTutor);
+
+        questionsCompleted = true;
+        removeTypingAndLoading();
+        addBotMessage(getLangText('processing'));
+
+        // Assicurati che email sia generata
+        if (!userData.email) {
+            const n = Date.now();
+            userData.email = `${n}student@gmail.com`;
+            console.log('Generated email:', userData.email);
+        }
+
+        // CHIAMATA API SINCRONA per creare notifica
+        $.ajax({
+            url: `${baseUrl}/question`,
+            data: {
+                language: currentLang,
+                question: count,
+                email: userData.email,
+                subject: userData.subject,
+                location: userData.location,
+                age: userData.age,
+                notificationId: notificationId
+            },
+            async: false,
+            method: 'post',
+            success: function(result) {
+                console.log('Notification API response:', result);
+                if (result?.data?.notificationId) {
+                    notificationId = result.data.notificationId;
+                    console.log('NotificationId saved:', notificationId);
+                }
+            },
+            error: function(err) {
+                console.error('Error creating notification:', err);
+            }
+        });
+
+        // Dopo 250ms mostra typing e inizia polling
+        setTimeout(() => {
+            console.log('Starting polling... isAssignTutor:', isAssignTutor);
+            removeTypingAndLoading();
+            addTypingIndicator();
+
+            if (isAssignTutor) {
+                console.log('Calling checkTutorAssignOrNot for the first time');
+                checkTutorAssignOrNot();
+            }
+
+            setIntervalTime = setInterval(() => {
+                if (isAssignTutor) {
+                    console.log('Polling checkTutorAssignOrNot...');
+                    checkTutorAssignOrNot();
+                }
+            }, 2000);
+        }, 250);
+
+        // Timeout dopo 30 secondi
+        setTimeout(function() {
+            console.log('30s timeout reached. isAssignTutor:', isAssignTutor);
+            clearInterval(setIntervalTime);
+            if (isAssignTutor) {
+                isAssignTutor = false;
+                removeTypingAndLoading();
+                addBotMessage(getLangText('noTutor'));
+                endRequestUI(currentLang === 'it' ? 'Richiesta inviata' : 'Request sent');
+            }
+        }, 30000);
+    }
+
+    function checkTutorAssignOrNot() {
+        console.log('=== CHECK TUTOR ASSIGN ===');
+        console.log('isAssignTutor:', isAssignTutor);
+        console.log('userData.email:', userData.email);
+
+        if (!isAssignTutor || !userData.email) {
+            console.log('Skipping check - conditions not met');
+            return;
+        }
+
+        const checkUrl = `${baseUrl}/checkTutorAssignOrNot/${userData.email}`;
+        console.log('Calling:', checkUrl);
+
+        $.ajax({
+            url: checkUrl,
+            method: 'GET',
+            success: function(result) {
+                console.log('Tutor assignment check result:', result);
+                if (result?.data && isAssignTutor && isAssignTutor_check) {
+                    console.log('Tutor found! Calling assignTutor()');
+                    isAssignTutor_check = false;
+                    assignTutor();
+                }
+            },
+            error: function(err) {
+                console.error('Check tutor error:', err);
+            }
+        });
+    }
+
+    function assignTutor() {
+        console.log('=== ASSIGN TUTOR ===');
+        $.ajax({
+            url: `${baseUrl}/getStudentTutor`,
+            method: 'POST',
+            data: userData,
+            success: function(result) {
+                console.log('Assign tutor result:', result);
+                isAssignTutor = false;
+                clearInterval(setIntervalTime);
+                removeTypingAndLoading();
+
+                if (result.success) {
+                    const tutor = result.data.tutor;
+                    userData.tutor_name = tutor.name;
+                    userData.tutor_surname = tutor.surname;
+                    userData.tutor_email = tutor.email;
+                    userData.tutor_mobile = tutor.mobileNumber;
+                    userData.tutor_description = tutor.description;
+
+                    if (result.data.notificationId) {
+                        notificationId = result.data.notificationId;
+                    }
+
+                    const tutorHTML = `
+                        <div class="tutor-card">
+                            ${tutor.imageUrl ? `<img src="${tutor.imageUrl}" alt="${tutor.name}">` : ''}
+                            <p>${tutor.description}</p>
+                        </div>
+                    `;
+                    addMessage(tutorHTML, 'bot', true);
+
+                    sendNotification('tutor_assigned');
+
+                    setTimeout(() => {
+                        addBotMessage(getLangText('phoneQuestion'));
+                        setTimeout(() => {
+                            lastQuestionTitle = 'phone_number';
+                            const input = document.getElementById('userInput');
+                            input.placeholder = currentLang === 'it' ? 'Inserisci il tuo numero' : 'Enter your phone number';
+                            enableTextInput();
+                        }, 300);
+                    }, 2000);
+
+                } else {
+                    addBotMessage(getLangText('noTutor'));
+                    endRequestUI(currentLang === 'it' ? 'Nessun tutor disponibile' : 'No tutor available');
+                }
+            },
+            error: function(err) {
+                console.error('Assign tutor error:', err);
+                isAssignTutor = false;
+                clearInterval(setIntervalTime);
+                removeTypingAndLoading();
+                addBotMessage(getLangText('noTutor'));
+                endRequestUI(currentLang === 'it' ? 'Nessun tutor disponibile' : 'No tutor available');
+            }
+        });
+    }
+
+    function endRequestUI(placeholderText){
+        const input = document.getElementById('userInput');
+        const btn = document.getElementById('sendButton');
+        input.disabled = true;
+        btn.disabled = true;
+        input.placeholder = placeholderText || getLangText('conversationEnded');
+        input.style.backgroundColor = '#f5f5f5';
+        input.style.color = '#888';
+        input.style.cursor = 'not-allowed';
+        btn.style.backgroundColor = '#ccc';
+        btn.style.cursor = 'not-allowed';
+    }
+
+    function endConversationUI(){
+        removeTypingAndLoading();
+        const phone = userData.tutor_mobile || (currentLang === 'it' ? 'il numero che ti è stato fornito' : 'the number provided to you');
+        const msg = getLangText('contactMessage').replace('{phone}', phone);
+        addBotMessage(msg);
+
+        sendNotification('conversation_completed');
+
+        endRequestUI(getLangText('conversationEnded'));
+    }
+
+    function sendToFormspree(userData, phoneNumber) {
+        $.ajax({
+            url: 'https://formspree.io/f/xwprwgvw',
+            method: 'POST',
+            data: {
+                phone_number: phoneNumber,
+                subjects: Array.isArray(userData.subject) ? userData.subject.join(', ') : userData.subject,
+                location: userData.location,
+                school_year: userData.age,
+                email: userData.email,
+                tutor_name: userData.tutor_name || '',
+                tutor_surname: userData.tutor_surname || '',
+                tutor_email: userData.tutor_email || '',
+                tutor_mobile: userData.tutor_mobile || '',
+                tutor_description: userData.tutor_description || '',
+                notificationId: notificationId
+            },
+            success: function() {
+                console.log('Formspree submission successful');
+            },
+            error: function(err) {
+                console.error('Formspree error:', err);
+            }
+        });
+    }
+
+    document.getElementById('sendButton').addEventListener('click', handleTextSubmit);
+    document.getElementById('userInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            handleTextSubmit();
+        }
+    });
+
+    document.getElementById('languageChange').addEventListener('change', function() {
+        currentLang = this.value;
+        document.getElementById('sendButton').textContent = getLangText('send');
+
+        const firstMessage = document.querySelector('.message.bot');
+        if (firstMessage && document.querySelectorAll('.message').length === 1) {
+            firstMessage.querySelector('.message-bubble').textContent = getLangText('welcome');
+        }
+
+        const input = document.getElementById('userInput');
+        const currentPlaceholder = input.placeholder;
+
+        if (currentPlaceholder.includes('option') || currentPlaceholder.includes('opzione')) {
+            input.placeholder = getLangText('selectOption');
+        } else if (currentPlaceholder.includes('materie') || currentPlaceholder.includes('subjects')) {
+            input.placeholder = getLangText('selectUpTo2');
+        } else if (currentPlaceholder.includes('digita') || currentPlaceholder.includes('Type')) {
+            input.placeholder = getLangText('typeHere');
+        } else if (currentPlaceholder.includes('telefono') || currentPlaceholder.includes('phone')) {
+            input.placeholder = currentLang === 'it' ? 'Inserisci il tuo numero' : 'Enter your phone number';
+        }
+    });
+
+    window.addEventListener('load', function() {
+        setTimeout(() => {
+            addBotMessage(getLangText('welcome'));
+            setTimeout(() => { fetchNextQuestion(); }, 800);
+        }, 300);
+    });
+</script>
 </body>
-
 </html>
- 
+
+
