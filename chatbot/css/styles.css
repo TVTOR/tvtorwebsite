@@ -1,4 +1,5 @@
-/* Style the language selector properly */
+
+    /* Style the language selector properly */
 #languageChange {
     position: absolute;
     top: 10px;
@@ -75,7 +76,6 @@ div.options.dragscroll.location-selection {
     height: 0 !important;
     margin-top: 0 !important;
 }
-
 /* Expand location options only when there are option items */
 div.options.dragscroll.location-selection:has(.option) {
     height: 110px !important;
@@ -102,8 +102,81 @@ body {
     border-width: 3px !important;
 }
 
+/* Mobile header styles */
+.mobile-header {
+    display: none;
+    background: linear-gradient(135deg, #007AFF 0%, #0051D5 100%);
+    color: white;
+    padding: 16px 20px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.mobile-header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.mobile-header h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 400;
+    font-style: italic;
+}
+
+.mobile-header-logo {
+    height: 30px;
+    margin-right: 10px;
+}
+
+.mobile-header-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: background 0.2s;
+}
+
+.mobile-header-close:hover {
+    background: rgba(255,255,255,0.1);
+}
+
 /* Mobile font size adjustments */
 @media (max-width: 768px) {
+    .mobile-header {
+        display: block;
+    }
+
+    /* Add top padding to body to account for fixed header */
+    body {
+        padding-top: 70px;
+    }
+
+    /* Move language selector down on mobile */
+    #languageChange {
+        top: 83px !important;
+    }
+
+    /* Set minimum height for demo section on mobile */
+    section#demo {
+        min-height: 84vh;
+    }
+
+    /* Add margin top to first message on mobile */
+    div.conv-form-wrapper div.message.to.ready:first-child {
+        margin-top: 130px !important;
+    }
+
     /* Increase font size for messages on mobile */
     div.conv-form-wrapper div.message {
         font-size: 18px !important;
