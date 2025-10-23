@@ -1,202 +1,274 @@
 
-    /* Style the language selector properly */
-#languageChange {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    z-index: 1000;
-    padding: 5px 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    background: white;
-    font-size: 12px;
-}
+* { box-sizing: border-box; }
+body { font-family: 'Roboto', sans-serif; background: #f5f5f5; margin: 0; padding: 0; }
 
-/* Fix message positioning to prevent overlap with options */
-div.conv-form-wrapper div#messages div.message.to {
-    margin-bottom: 15px !important;
-}
-
-/* Adjust message positioning when dragscroll options are present */
-div.conv-form-wrapper div.options.dragscroll ~ div#messages div.message.to {
-    margin-top: -10px !important;
-}
-
-/* Ensure proper spacing during animations */
-div.conv-form-wrapper div.message {
-    animation: slideTopFixed 0.15s ease;
-}
-
-@keyframes slideTopFixed {
-    0% {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    100% {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Override the problematic slideTop animation */
-@keyframes slideTop {
-    0% {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    100% {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Ensure options have proper spacing from messages */
-div.conv-form-wrapper div.options {
-    margin-top: 10px;
-}
-
-/* Custom styling for options dragscroll container - only for subject selection */
-div.options.dragscroll.subject-selection {
-    height: 180px !important;
-    margin-top: 0 !important;
-}
-
-/* Adjust message positioning when dragscroll options are present for subject selection */
-div.conv-form-wrapper div.options.dragscroll.subject-selection ~ div#messages div.message.to {
-    margin-top: -10px !important;
-}
-
-/* Increase padding-bottom for messages container during subject selection */
-div#messages.subject-selection {
-    padding-bottom: 100px !important;
-}
-
-/* Custom styling for options dragscroll container - only for location selection */
-div.options.dragscroll.location-selection {
-    height: 0 !important;
-    margin-top: 0 !important;
-}
-/* Expand location options only when there are option items */
-div.options.dragscroll.location-selection:has(.option) {
-    height: 110px !important;
-}
-
-/* Increase padding-bottom for messages container during location selection */
-div#messages.location-selection {
-    padding-bottom: 25px !important;
-}
-
-/* Ensure no overflow CSS text appears */
-body {
-    overflow-x: hidden;
-}
-
-/* Clean up any debug content */
-* {
-    line-height: normal;
-}
-
-/* Make the start button text bold and increase border thickness */
-.option {
-    font-weight: bold !important;
-    border-width: 3px !important;
-}
-
-/* Mobile header styles */
-.mobile-header {
-    display: none;
-    background: linear-gradient(135deg, #007AFF 0%, #0051D5 100%);
-    color: white;
-    padding: 16px 20px;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 1000;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-}
-
-.mobile-header-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
+.mobile-header { display: none; background: #fff; padding: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); position: fixed; top: 0; width: 100%; z-index: 1000; }
+.mobile-header-content { display: flex; justify-content: space-between; align-items: center; }
+.mobile-header-logo { width: 40px; height: 40px; margin-right: 10px; }
+.mobile-header-close { background: none; border: none; font-size: 30px; cursor: pointer; }
 .mobile-header h3 {
+    color: #007bff;
     margin: 0;
     font-size: 16px;
-    font-weight: 400;
-    font-style: italic;
-}
-
-.mobile-header-logo {
-    height: 30px;
-    margin-right: 10px;
 }
 
 .mobile-header-close {
     background: none;
     border: none;
-    color: white;
-    font-size: 20px;
+    font-size: 30px;
     cursor: pointer;
-    padding: 4px 8px;
-    border-radius: 6px;
-    transition: background 0.2s;
+    color: #007bff;
+    line-height: 1;
+    padding: 0;
 }
 
 .mobile-header-close:hover {
-    background: rgba(255,255,255,0.1);
+    color: #0056b3;
+}
+#languageWrapper {
+    position: fixed;
+    top: 60px;
+    right: 30px;
+    z-index: 1000;
+}
+#languageChange {
+    padding: 6px 12px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    background: white;
+    font-size: 13px;
+    min-width: 80px;
+    max-width: 100px;
+    cursor: pointer;
 }
 
-/* Mobile font size adjustments */
+
+
+
+.chat-container { max-width: 600px; margin: 50px auto; background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); height: 600px; display: flex; flex-direction: column; }
+.messages-container { flex: 1; overflow-y: auto; padding: 20px; scroll-behavior: smooth; }
+
+.message { margin-bottom: 15px; animation: fadeIn 0.3s ease-in; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.message.bot { text-align: left; }
+.message.user { text-align: right; }
+
+.message-bubble { display: inline-block; padding: 12px 18px; border-radius: 18px; max-width: 70%; word-wrap: break-word; }
+.message.bot .message-bubble { background: #e9ecef; color: #333; }
+.message.user .message-bubble { background: #007bff; color: white; }
+
+.message.typing .message-bubble { background: #e9ecef; padding: 12px 20px; }
+.typing-indicator { display: inline-flex; gap: 4px; }
+.typing-indicator span { width: 8px; height: 8px; background: #999; border-radius: 50%; animation: typing 1.4s infinite; }
+.typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+.typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes typing { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-10px); } }
+
+.options-container { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; justify-content: flex-start; }
+.option-button { padding: 10px 20px; background: white; border: 2px solid #007bff; color: #007bff; border-radius: 20px; cursor: pointer; transition: all 0.3s; font-size: 14px; }
+.option-button:hover, .option-button.selected { background: #007bff; color: white; }
+.option-button.disabled { opacity: 0.5; pointer-events: none; }
+
+.tutor-card { background: white; border: 1px solid #ddd; border-radius: 10px; padding: 15px; margin: 10px 0; text-align: center; }
+.tutor-card img { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; margin-bottom: 10px; }
+
+.input-container { padding: 15px; border-top: 1px solid #ddd; display: flex; gap: 10px; }
+#userInput { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 25px; font-size: 14px; outline: none; }
+#userInput:focus { border-color: #007bff; }
+#sendButton { padding: 20px 20px; background: #007bff; color: white; border: none; border-radius: 25px; cursor: pointer; font-weight: bold; transition: background 0.3s; }
+#sendButton:hover { background: #0056b3; }
+#sendButton:disabled { background: #ccc; cursor: not-allowed; }
+
+.subject-selection .options-container { max-height: 300px; overflow-y: auto; }
+
 @media (max-width: 768px) {
-    .mobile-header {
-        display: block;
+    .mobile-header { display: block; }
+    .chat-container { margin: 80px 10px 10px; height: calc(100vh - 100px); }
+    #languageChange { top: 80px; left: 15px; }
+}
+
+.subject-counter {
+    text-align: center;
+    padding: 10px;
+    margin: 10px 0;
+    background: #e3f2fd;
+    border-radius: 8px;
+    color: #1976d2;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.error-message {
+    display: none;
+    text-align: center;
+    padding: 10px;
+    margin: 10px 0;
+    background: #ffebee;
+    border: 1px solid #ef5350;
+    border-radius: 8px;
+    color: #c62828;
+    font-weight: 500;
+    font-size: 14px;
+    animation: shake 0.5s;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    75% { transform: translateX(10px); }
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background: #f5f5f5;
+    margin: 0;
+    padding: 0;
+    /* AGGIUNGI QUESTE RIGHE: */
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+}
+
+
+.mobile-header {
+    display: none;
+    background: #fff;
+    padding: 15px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    /* AGGIUNGI QUESTE RIGHE: */
+    padding-top: calc(15px + env(safe-area-inset-top));
+    padding-left: calc(15px + env(safe-area-inset-left));
+    padding-right: calc(15px + env(safe-area-inset-right));
+}
+
+
+#languageWrapper {
+    position: fixed;
+    top: 60px;
+    right: 30px;
+    z-index: 1000;
+    /* AGGIUNGI QUESTE RIGHE: */
+    top: calc(60px + env(safe-area-inset-top));
+    right: calc(30px + env(safe-area-inset-right));
+}
+
+.chat-container {
+    max-width: 600px;
+    margin: 50px auto;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    /* CAMBIA height: 600px; CON: */
+    height: calc(100vh - 100px);
+    max-height: 600px;
+    display: flex;
+    flex-direction: column;
+    /* AGGIUNGI QUESTE RIGHE: */
+    margin-top: calc(50px + env(safe-area-inset-top));
+    margin-bottom: calc(50px + env(safe-area-inset-bottom));
+}
+
+
+.messages-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    scroll-behavior: smooth;
+    /* AGGIUNGI QUESTA RIGA: */
+    padding-bottom: 30px;
+}
+
+.options-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+    justify-content: flex-start;
+    /* AGGIUNGI QUESTA RIGA: */
+    margin-bottom: 15px;
+}
+
+
+.input-container {
+    padding: 15px;
+    border-top: 1px solid #ddd;
+    display: flex;
+    gap: 10px;
+    /* AGGIUNGI QUESTE RIGHE: */
+    background: white;
+    border-radius: 0 0 10px 10px;
+    padding-bottom: calc(15px + env(safe-area-inset-bottom));
+}
+
+
+.subject-counter {
+    text-align: center;
+    padding: 10px;
+    /* CAMBIA margin: 10px 0; CON: */
+    margin: 10px 0 15px 0;
+    background: #e3f2fd;
+    border-radius: 8px;
+    color: #1976d2;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+
+.error-message {
+    display: none;
+    text-align: center;
+    padding: 10px;
+    /* CAMBIA margin: 10px 0; CON: */
+    margin: 10px 0 15px 0;
+    background: #ffebee;
+    border: 1px solid #ef5350;
+    border-radius: 8px;
+    color: #c62828;
+    font-weight: 500;
+    font-size: 14px;
+    animation: shake 0.5s;
+}
+
+@media (max-width: 768px) {
+    .mobile-header { display: block; }
+
+    .chat-container {
+        margin: 0 10px;
+        /* CAMBIA questa riga: */
+        margin-top: calc(80px + env(safe-area-inset-top));
+        margin-bottom: calc(10px + env(safe-area-inset-bottom));
+        /* E questa: */
+        height: calc(100vh - 100px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+        max-height: none;
+        border-radius: 10px;
     }
 
-    /* Add top padding to body to account for fixed header */
-    body {
-        padding-top: 70px;
+
+    #languageWrapper {
+        top: calc(80px + env(safe-area-inset-top));
+        left: calc(15px + env(safe-area-inset-left));
+        right: auto;
     }
 
-    /* Move language selector down on mobile */
-    #languageChange {
-        top: 83px !important;
+    .messages-container {
+        padding: 15px;
+        padding-bottom: 20px;
+    }
+}
+
+@supports (height: 100dvh) {
+    .chat-container {
+        height: calc(100dvh - 100px);
     }
 
-    /* Set minimum height for demo section on mobile */
-    section#demo {
-        min-height: 84vh;
-    }
-
-    /* Add margin top to first message on mobile */
-    div.conv-form-wrapper div.message.to.ready:first-child {
-        margin-top: 130px !important;
-    }
-
-    /* Increase font size for messages on mobile */
-    div.conv-form-wrapper div.message {
-        font-size: 18px !important;
-        line-height: 1.4 !important;
-    }
-
-    /* Increase font size for options on mobile */
-    div.conv-form-wrapper div.options .option {
-        font-size: 16px !important;
-        /* padding: 12px 16px !important; */
-    }
-
-    /* Increase font size for input field on mobile */
-    div.conv-form-wrapper input[type="text"],
-    div.conv-form-wrapper textarea {
-        font-size: 16px !important;
-    }
-
-    /* Increase font size for submit button on mobile */
-    div.conv-form-wrapper .submit {
-        font-size: 16px !important;
+    @media (max-width: 768px) {
+        .chat-container {
+            height: calc(100dvh - 100px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+        }
     }
 }
