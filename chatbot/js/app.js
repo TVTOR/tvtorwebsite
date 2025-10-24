@@ -18,7 +18,8 @@ const messages = {
         welcome: "Ciao! 👋 In meno di 1 minuto troviamo un tutor giusto per Te gratuitamente. 🎓 Rispondi a 3 semplici domande e riceverai il contatto del tutor. 👇",
         processing: "Grazie! Stiamo cercando il miglior tutor per te. Attendi per favore...",
         noTutor: "Non ci sono tutor disponibili al momento. Scrivici al +39 3485804824!",
-        phoneQuestion: "Inserisci il tuo numero di telefono per essere contattato dal tutor:",
+        phoneQuestion: "📞 Inserisci il tuo numero di telefono per essere contattato dal tutor 🤝\n" +
+                       "🔒 Il numero verrà inviato all'insegnante e poi cancellato automaticamente ✅",
         contactMessage: "Ora puoi contattare il tutor al numero {phone}. Buona lezione!",
         conversationEnded: "Conversazione terminata",
         selectUpTo2: "Seleziona fino a 2 materie",
@@ -34,7 +35,8 @@ const messages = {
         welcome: "Hi! 👋 In less than a minute, we'll find the right tutor for you for free. 🎓 Answer 3 simple questions and you'll receive the tutor's contact. 👇",
         processing: "Thank you! We're finding the best tutor for you. Please wait...",
         noTutor: "No tutors are available right now. Contact us at +393485804824!",
-        phoneQuestion: "Enter your phone number to be contacted by the tutor:",
+        phoneQuestion: "📞 Enter your phone number to be contacted by the tutor 🤝\n" +
+                       "🔒 The number will be sent to the teacher and then automatically deleted ✅",
         contactMessage: "You can now contact the tutor at the number {phone}. Have a nice lesson!",
         conversationEnded: "Conversation ended",
         selectUpTo2: "Select up to 2 subjects",
@@ -48,9 +50,11 @@ const messages = {
     }
 };
 
-function getLangText(key){ return messages[currentLang][key] || key; }
+function getLangText(key) {
+    return messages[currentLang][key] || key;
+}
 
-function scrollToBottom(){
+function scrollToBottom() {
     const c = document.getElementById('messagesContainer');
     c.scrollTop = c.scrollHeight;
 }
@@ -72,8 +76,13 @@ function addMessage(text, type = 'bot', isHTML = false) {
     return messageDiv;
 }
 
-function addBotMessage(text){ return addMessage(text, 'bot', false); }
-function addUserMessage(text){ return addMessage(text, 'user', false); }
+function addBotMessage(text) {
+    return addMessage(text, 'bot', false);
+}
+
+function addUserMessage(text) {
+    return addMessage(text, 'user', false);
+}
 
 function addTypingIndicator() {
     removeTypingIndicator();
@@ -96,9 +105,9 @@ function removeTypingIndicator() {
     if (n) n.remove();
 }
 
-function removeTypingAndLoading(){
+function removeTypingAndLoading() {
     removeTypingIndicator();
-    document.querySelectorAll('#messagesContainer .message').forEach(n=>{
+    document.querySelectorAll('#messagesContainer .message').forEach(n => {
         const txt = (n.textContent || '').trim();
         if (n.classList.contains('typing') || n.classList.contains('loading') || txt === '...') {
             n.remove();
@@ -106,7 +115,7 @@ function removeTypingAndLoading(){
     });
 }
 
-function disableInput(){
+function disableInput() {
     const input = document.getElementById('userInput');
     const btn = document.getElementById('sendButton');
     input.disabled = true;
@@ -162,7 +171,7 @@ function enableTextInput(questionName) {
 
     userInput.disabled = false;
     sendButton.disabled = false;
-    setTimeout(()=>userInput.focus(), 50);
+    setTimeout(() => userInput.focus(), 50);
 
     if (questionName === 'age') {
         userInput.placeholder = currentLang === 'it' ? 'digita qui' : 'Type here';
@@ -173,12 +182,12 @@ function enableTextInput(questionName) {
     }
 }
 
-function enableInputFor(q){
+function enableInputFor(q) {
     if (q.type === 'text') enableTextInput(q.title || '');
     else disableInput();
 }
 
-function applyPlaceholderHints(qData){
+function applyPlaceholderHints(qData) {
     const q = qData[0];
     const input = document.getElementById('userInput');
     if (q.type === 'select') {
@@ -196,7 +205,7 @@ function applyPlaceholderHints(qData){
     }
 }
 
-function addOptions(options, { multiple = false, name = '' } = {}) {
+function addOptions(options, {multiple = false, name = ''} = {}) {
     document.getElementById('currentOptions')?.remove();
     document.getElementById('subjectCounter')?.remove();
     selectedSubjects = []; // Reset
@@ -225,7 +234,7 @@ function addOptions(options, { multiple = false, name = '' } = {}) {
                     return;
                 }
                 await fetchNextQuestion();
-            }, { once: true });
+            }, {once: true});
         } else {
             // Selezione multipla (subject) - max 2
             btn.addEventListener('click', () => {
@@ -366,7 +375,7 @@ async function fetchNextQuestion() {
 
         const res = await fetch(`${baseUrl}/question`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(payload)
         });
 
@@ -392,7 +401,7 @@ async function fetchNextQuestion() {
         currentQuestionId = qKey;
 
         const titleLower = (qData[0].title || '').toLowerCase();
-        if (['mobilenumber','phone_number','phone','telefono','numero'].some(k => titleLower.includes(k))) {
+        if (['mobilenumber', 'phone_number', 'phone', 'telefono', 'numero'].some(k => titleLower.includes(k))) {
             isFetching = false;
             return fetchNextQuestion();
         }
@@ -419,7 +428,7 @@ function renderQuestion(qData) {
 
     if (q.type === 'select') {
         const multiple = (q.title === 'subject');
-        addOptions(q.options || [], { multiple, name: q.title });
+        addOptions(q.options || [], {multiple, name: q.title});
     } else {
         enableTextInput(q.title || '');
     }
@@ -441,10 +450,10 @@ function sendNotification(type) {
             tutorEmail: userData.tutor_email || '',
             language: currentLang
         },
-        success: function() {
+        success: function () {
             console.log('Notification sent successfully:', type);
         },
-        error: function(err) {
+        error: function (err) {
             console.error('Notification error:', err);
         }
     });
@@ -478,14 +487,14 @@ function startTutorSearch() {
         },
         async: false,
         method: 'post',
-        success: function(result) {
+        success: function (result) {
             console.log('Notification API response:', result);
             if (result?.data?.notificationId) {
                 notificationId = result.data.notificationId;
                 console.log('NotificationId saved:', notificationId);
             }
         },
-        error: function(err) {
+        error: function (err) {
             console.error('Error creating notification:', err);
         }
     });
@@ -508,7 +517,7 @@ function startTutorSearch() {
         }, 2000);
     }, 250);
 
-    setTimeout(function() {
+    setTimeout(function () {
         console.log('30s timeout reached. isAssignTutor:', isAssignTutor);
         clearInterval(setIntervalTime);
         if (isAssignTutor) {
@@ -536,7 +545,7 @@ function checkTutorAssignOrNot() {
     $.ajax({
         url: checkUrl,
         method: 'GET',
-        success: function(result) {
+        success: function (result) {
             console.log('Tutor assignment check result:', result);
             if (result?.data && isAssignTutor && isAssignTutor_check) {
                 console.log('Tutor found! Calling assignTutor()');
@@ -544,7 +553,7 @@ function checkTutorAssignOrNot() {
                 assignTutor();
             }
         },
-        error: function(err) {
+        error: function (err) {
             console.error('Check tutor error:', err);
         }
     });
@@ -556,7 +565,7 @@ function assignTutor() {
         url: `${baseUrl}/getStudentTutor`,
         method: 'POST',
         data: userData,
-        success: function(result) {
+        success: function (result) {
             console.log('Assign tutor result:', result);
             isAssignTutor = false;
             clearInterval(setIntervalTime);
@@ -599,7 +608,7 @@ function assignTutor() {
                 endRequestUI(currentLang === 'it' ? 'Nessun tutor disponibile' : 'No tutor available');
             }
         },
-        error: function(err) {
+        error: function (err) {
             console.error('Assign tutor error:', err);
             isAssignTutor = false;
             clearInterval(setIntervalTime);
@@ -610,7 +619,7 @@ function assignTutor() {
     });
 }
 
-function endRequestUI(placeholderText){
+function endRequestUI(placeholderText) {
     const input = document.getElementById('userInput');
     const btn = document.getElementById('sendButton');
     input.disabled = true;
@@ -623,7 +632,7 @@ function endRequestUI(placeholderText){
     btn.style.cursor = 'not-allowed';
 }
 
-function endConversationUI(){
+function endConversationUI() {
     removeTypingAndLoading();
     const phone = userData.tutor_mobile || (currentLang === 'it' ? 'il numero che ti è stato fornito' : 'the number provided to you');
     const msg = getLangText('contactMessage').replace('{phone}', phone);
@@ -651,24 +660,24 @@ function sendToFormspree(userData, phoneNumber) {
             tutor_description: userData.tutor_description || '',
             notificationId: notificationId
         },
-        success: function() {
+        success: function () {
             console.log('Formspree submission successful');
         },
-        error: function(err) {
+        error: function (err) {
             console.error('Formspree error:', err);
         }
     });
 }
 
 document.getElementById('sendButton').addEventListener('click', handleTextSubmit);
-document.getElementById('userInput').addEventListener('keypress', function(e) {
+document.getElementById('userInput').addEventListener('keypress', function (e) {
     if (e.key === 'Enter') {
         e.preventDefault();
         handleTextSubmit();
     }
 });
 
-document.getElementById('languageChange').addEventListener('change', function() {
+document.getElementById('languageChange').addEventListener('change', function () {
     currentLang = this.value;
     document.getElementById('sendButton').textContent = getLangText('send');
 
@@ -698,9 +707,11 @@ document.getElementById('languageChange').addEventListener('change', function() 
     }
 });
 
-window.addEventListener('load', function() {
+window.addEventListener('load', function () {
     setTimeout(() => {
         addBotMessage(getLangText('welcome'));
-        setTimeout(() => { fetchNextQuestion(); }, 800);
+        setTimeout(() => {
+            fetchNextQuestion();
+        }, 800);
     }, 300);
 });
