@@ -145,7 +145,15 @@ function showSubjectCounter() {
     scrollToBottom();
 }
 
+
+let errorTimeout = null;
+
 function showErrorMessage(message) {
+    if (errorTimeout) {
+        clearTimeout(errorTimeout);
+        errorTimeout = null;
+    }
+
     let errorMsg = document.getElementById('errorMessage');
     if (!errorMsg) {
         errorMsg = document.createElement('div');
@@ -153,15 +161,30 @@ function showErrorMessage(message) {
         errorMsg.className = 'error-message';
         document.getElementById('messagesContainer').appendChild(errorMsg);
     }
+
     errorMsg.textContent = message;
     errorMsg.style.display = 'block';
+    errorMsg.style.opacity = '1';
+
+    void errorMsg.offsetHeight;
 
     setTimeout(() => {
-        errorMsg.style.display = 'none';
-    }, 3000);
+        errorMsg.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 100);
 
-    scrollToBottom();
+    errorTimeout = setTimeout(() => {
+        errorMsg.style.transition = 'opacity 0.3s ease';
+        errorMsg.style.opacity = '0';
+
+        setTimeout(() => {
+            errorMsg.style.display = 'none';
+            errorMsg.style.transition = '';
+        }, 300);
+    }, 1000);
 }
+
+
+
 
 function enableTextInput(questionName) {
     lastQuestionTitle = questionName || lastQuestionTitle;
@@ -208,7 +231,7 @@ function applyPlaceholderHints(qData) {
 function addOptions(options, {multiple = false, name = ''} = {}) {
     document.getElementById('currentOptions')?.remove();
     document.getElementById('subjectCounter')?.remove();
-    selectedSubjects = []; // Reset
+    selectedSubjects = [];
 
     const wrap = document.createElement('div');
     wrap.id = 'currentOptions';
@@ -222,7 +245,6 @@ function addOptions(options, {multiple = false, name = ''} = {}) {
         btn.dataset.value = opt.value || opt.text || opt;
 
         if (!multiple) {
-            // Selezione singola (location)
             btn.addEventListener('click', async () => {
                 if (isFetching) return;
                 addUserMessage(btn.textContent);
@@ -236,15 +258,26 @@ function addOptions(options, {multiple = false, name = ''} = {}) {
                 await fetchNextQuestion();
             }, {once: true});
         } else {
-            // Selezione multipla (subject) - max 2
             btn.addEventListener('click', () => {
                 if (btn.classList.contains('selected')) {
-                    // Deseleziona
                     btn.classList.remove('selected');
                     const index = selectedSubjects.indexOf(btn.dataset.value);
                     if (index > -1) selectedSubjects.splice(index, 1);
+
+                    const errorMsg = document.getElementById('errorMessage');
+                    if (errorMsg) {
+                        if (errorTimeout) {
+                            clearTimeout(errorTimeout);
+                            errorTimeout = null;
+                        }
+                        errorMsg.style.transition = 'opacity 0.3s ease';
+                        errorMsg.style.opacity = '0';
+                        setTimeout(() => {
+                            errorMsg.style.display = 'none';
+                        }, 300);
+                    }
+
                 } else {
-                    // Seleziona
                     if (selectedSubjects.length >= 2) {
                         showErrorMessage(getLangText('maxSubjectsError'));
                         return;
@@ -255,7 +288,6 @@ function addOptions(options, {multiple = false, name = ''} = {}) {
 
                 showSubjectCounter();
 
-                // Abilita/disabilita pulsante invia
                 if (selectedSubjects.length > 0) {
                     enableSendButton();
                 } else {
@@ -271,7 +303,7 @@ function addOptions(options, {multiple = false, name = ''} = {}) {
 
     if (multiple) {
         showSubjectCounter();
-        disableSendButton(); // Inizialmente disabilitato
+        disableSendButton();
     }
 
     scrollToBottom();
@@ -361,6 +393,8 @@ async function fetchNextQuestion() {
             return;
         }
 
+        addTypingIndicator();
+
         const payload = {
             language: currentLang,
             question: count,
@@ -385,6 +419,8 @@ async function fetchNextQuestion() {
 
         const result = await res.json();
         const qData = (result?.data?.data) || [];
+
+        removeTypingIndicator();
 
         if (!qData.length) {
             enableTextInput();
@@ -414,11 +450,13 @@ async function fetchNextQuestion() {
 
     } catch (e) {
         console.error('fetchNextQuestion error', e);
+        removeTypingIndicator();
         addBotMessage(currentLang === 'it' ? 'Errore temporaneo. Riprova.' : 'Temporary error. Please try again.');
     } finally {
         isFetching = false;
     }
 }
+
 
 function renderQuestion(qData) {
     const q = qData[0];
@@ -594,14 +632,18 @@ function assignTutor() {
                 sendNotification('tutor_assigned');
 
                 setTimeout(() => {
-                    addBotMessage(getLangText('phoneQuestion'));
+                    addTypingIndicator();
                     setTimeout(() => {
-                        lastQuestionTitle = 'phone_number';
-                        const input = document.getElementById('userInput');
-                        input.placeholder = currentLang === 'it' ? 'Inserisci il tuo numero' : 'Enter your phone number';
-                        enableTextInput();
-                    }, 300);
-                }, 2000);
+                        removeTypingIndicator();
+                        addBotMessage(getLangText('phoneQuestion'));
+                        setTimeout(() => {
+                            lastQuestionTitle = 'phone_number';
+                            const input = document.getElementById('userInput');
+                            input.placeholder = currentLang === 'it' ? 'Inserisci il tuo numero' : 'Enter your phone number';
+                            enableTextInput();
+                        }, 200);
+                    }, 800);
+                }, 300);
 
             } else {
                 addBotMessage(getLangText('noTutor'));
@@ -618,6 +660,8 @@ function assignTutor() {
         }
     });
 }
+
+
 
 function endRequestUI(placeholderText) {
     const input = document.getElementById('userInput');
@@ -709,9 +753,15 @@ document.getElementById('languageChange').addEventListener('change', function ()
 
 window.addEventListener('load', function () {
     setTimeout(() => {
-        addBotMessage(getLangText('welcome'));
+        addTypingIndicator();
         setTimeout(() => {
-            fetchNextQuestion();
+            removeTypingIndicator();
+            addBotMessage(getLangText('welcome'));
+            setTimeout(() => {
+                fetchNextQuestion();
+            }, 400);
         }, 800);
-    }, 300);
+    }, 200);
 });
+
+
