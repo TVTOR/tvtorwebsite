@@ -98,7 +98,15 @@ body {
 .message.bot { text-align: left; }
 .message.user { text-align: right; }
 
-.message-bubble { display: inline-block; padding: 12px 18px; border-radius: 18px; max-width: 70%; word-wrap: break-word; }
+.message-bubble {
+    display: inline-block;
+    padding: 12px 18px;
+    border-radius: 18px;
+    max-width: 70%;
+    word-wrap: break-word;
+    font-size: 18px;
+}
+
 .message.bot .message-bubble { background: #e9ecef; color: #333; }
 .message.user .message-bubble { background: #007bff; color: white; }
 
@@ -130,7 +138,7 @@ body {
     border-radius: 20px;
     cursor: pointer;
     transition: all 0.3s ease;
-    font-size: 14px;
+    font-size: 18px;
 }
 
 .option-button:not(.selected):hover {
@@ -159,8 +167,26 @@ body {
     pointer-events: none;
 }
 
-.tutor-card { background: white; border: 1px solid #ddd; border-radius: 10px; padding: 15px; margin: 10px 0; text-align: center; }
-.tutor-card img { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; margin-bottom: 10px; }
+.tutor-card {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 15px;
+    margin: 10px 0;
+    text-align: center;
+}
+
+.tutor-card img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 10px;
+}
+
+.tutor-card p {
+    font-size: 18px;
+}
 
 .input-container {
     padding: 15px;
@@ -172,9 +198,29 @@ body {
     padding-bottom: calc(15px + env(safe-area-inset-bottom));
 }
 
-#userInput { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 25px; font-size: 14px; outline: none; }
+#userInput {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 25px;
+    font-size: 18px;
+    outline: none;
+}
+
 #userInput:focus { border-color: #007bff; }
-#sendButton { padding: 20px 20px; background: #007bff; color: white; border: none; border-radius: 25px; cursor: pointer; font-weight: bold; transition: background 0.3s; }
+
+#sendButton {
+    padding: 20px 20px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.3s;
+    font-size: 18px;
+}
+
 #sendButton:hover { background: #0056b3; }
 #sendButton:disabled { background: #ccc; cursor: not-allowed; }
 
@@ -188,7 +234,7 @@ body {
     border-radius: 8px;
     color: #1976d2;
     font-weight: 500;
-    font-size: 14px;
+    font-size: 18px;
 }
 
 .error-message {
@@ -201,7 +247,7 @@ body {
     border-radius: 8px;
     color: #c62828;
     font-weight: 600;
-    font-size: 15px;
+    font-size: 18px;
     position: relative;
     z-index: 100;
     box-shadow: 0 4px 12px rgba(239, 83, 80, 0.4);
@@ -237,7 +283,7 @@ body {
     }
 
     .error-message {
-        font-size: 14px;
+        font-size: 16px;
         padding: 12px 16px;
         margin: 10px 8px 16px 8px;
         position: sticky;
@@ -246,9 +292,29 @@ body {
     }
 
     .subject-counter {
-        font-size: 13px;
+        font-size: 16px;
         padding: 10px;
         margin: 10px 8px 14px 8px;
+    }
+
+    .option-button {
+        font-size: 16px;
+    }
+
+    .message-bubble {
+        font-size: 16px;
+    }
+
+    #userInput {
+        font-size: 16px;
+    }
+
+    #sendButton {
+        font-size: 16px;
+    }
+
+    .tutor-card p {
+        font-size: 16px;
     }
 }
 
@@ -263,6 +329,7 @@ body {
         }
     }
 }
+
 .typing-indicator {
     display: inline-flex;
     align-items: center;

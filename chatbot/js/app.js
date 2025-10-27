@@ -11,16 +11,17 @@ let lastQuestionTitle = null;
 let currentLang = 'it';
 let notificationSent = false;
 let questionsCompleted = false;
-let selectedSubjects = []; // Array per tracciare materie selezionate
+let selectedSubjects = [];
+let messageCount = 0;
 
 const messages = {
     it: {
-        welcome: "Ciao! 👋 In meno di 1 minuto troviamo un tutor giusto per Te gratuitamente. 🎓 Rispondi a 3 semplici domande e riceverai il contatto del tutor. 👇",
+        welcome: "Ciao! 👋 In meno di 1 minuto troviamo un tutor giusto per Te gratuitamente. 🎓 Rispondi a 3 domande e il tutor assegnato ti contatterà entro 8 ore 👇",
         processing: "Grazie! Stiamo cercando il miglior tutor per te. Attendi per favore...",
         noTutor: "Non ci sono tutor disponibili al momento. Scrivici al +39 3485804824!",
         phoneQuestion: "📞 Inserisci il tuo numero di telefono per essere contattato dal tutor 🤝\n" +
-                       "🔒 Il numero verrà inviato all'insegnante e poi cancellato automaticamente ✅",
-        contactMessage: "Ora puoi contattare il tutor al numero {phone}. Buona lezione!",
+            "🔒 Il numero verrà inviato all'insegnante e poi cancellato automaticamente ✅",
+        contactMessage: "Il numero di telefono del tutor è: {phone}\nBuona lezione!",
         conversationEnded: "Conversazione terminata",
         selectUpTo2: "Seleziona fino a 2 materie",
         selectOption: "seleziona un'opzione",
@@ -32,12 +33,12 @@ const messages = {
         selectAtLeastOne: "Seleziona almeno una materia"
     },
     en: {
-        welcome: "Hi! 👋 In less than a minute, we'll find the right tutor for you for free. 🎓 Answer 3 simple questions and you'll receive the tutor's contact. 👇",
+        welcome: "Hi! 👋 In less than a minute, we'll find the right tutor for you for free. 🎓 Answer 3 questions and the assigned tutor will contact you within 8 hours 👇",
         processing: "Thank you! We're finding the best tutor for you. Please wait...",
         noTutor: "No tutors are available right now. Contact us at +393485804824!",
         phoneQuestion: "📞 Enter your phone number to be contacted by the tutor 🤝\n" +
-                       "🔒 The number will be sent to the teacher and then automatically deleted ✅",
-        contactMessage: "You can now contact the tutor at the number {phone}. Have a nice lesson!",
+            "🔒 The number will be sent to the teacher and then automatically deleted ✅",
+        contactMessage: "The tutor's phone number is: {phone}\nHave a nice lesson!",
         conversationEnded: "Conversation ended",
         selectUpTo2: "Select up to 2 subjects",
         selectOption: "Select an option",
@@ -59,7 +60,7 @@ function scrollToBottom() {
     c.scrollTop = c.scrollHeight;
 }
 
-function addMessage(text, type = 'bot', isHTML = false) {
+function addMessage(text, type = 'bot', isHTML = false, skipScroll = false) {
     const messagesContainer = document.getElementById('messagesContainer');
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${type}`;
@@ -72,12 +73,19 @@ function addMessage(text, type = 'bot', isHTML = false) {
 
     messageDiv.appendChild(bubbleDiv);
     messagesContainer.appendChild(messageDiv);
-    scrollToBottom();
+
+    messageCount++;
+
+    // Non fare scroll per i primi 2 messaggi
+    if (!skipScroll && messageCount > 2) {
+        scrollToBottom();
+    }
+
     return messageDiv;
 }
 
-function addBotMessage(text) {
-    return addMessage(text, 'bot', false);
+function addBotMessage(text, skipScroll = false) {
+    return addMessage(text, 'bot', false, skipScroll);
 }
 
 function addUserMessage(text) {
@@ -97,7 +105,11 @@ function addTypingIndicator() {
 
     messageDiv.appendChild(bubbleDiv);
     messagesContainer.appendChild(messageDiv);
-    scrollToBottom();
+
+    // Scroll solo se non siamo nei primi messaggi
+    if (messageCount > 2) {
+        scrollToBottom();
+    }
 }
 
 function removeTypingIndicator() {
@@ -142,8 +154,14 @@ function showSubjectCounter() {
     }
     const count = selectedSubjects.length;
     counter.textContent = `${getLangText('selected')} ${count} ${getLangText('of')} 2`;
-    scrollToBottom();
+
+    // Scroll quando l'utente inizia a selezionare materie
+    if (selectedSubjects.length > 0) {
+        scrollToBottom();
+    }
 }
+
+
 
 
 let errorTimeout = null;
@@ -306,8 +324,13 @@ function addOptions(options, {multiple = false, name = ''} = {}) {
         disableSendButton();
     }
 
-    scrollToBottom();
+    if (messageCount > 2) {
+        scrollToBottom();
+    }
 }
+
+
+
 
 async function handleTextSubmit() {
     if (isFetching) return;
@@ -756,12 +779,10 @@ window.addEventListener('load', function () {
         addTypingIndicator();
         setTimeout(() => {
             removeTypingIndicator();
-            addBotMessage(getLangText('welcome'));
+            addBotMessage(getLangText('welcome'), true); // skipScroll=true per il primo messaggio
             setTimeout(() => {
                 fetchNextQuestion();
             }, 400);
         }, 800);
     }, 200);
 });
-
-
