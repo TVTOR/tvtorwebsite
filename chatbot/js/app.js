@@ -51,6 +51,27 @@ const messages = {
     }
 };
 
+function isDesktop() {
+    try {
+        // Prova a leggere la larghezza della finestra parent (se in iframe)
+        if (window.parent && window.parent !== window) {
+            return window.parent.innerWidth > 768;
+        }
+    } catch (e) {
+        // Se c'è un errore di cross-origin, usa window.top
+        try {
+            if (window.top && window.top !== window) {
+                return window.top.innerWidth > 768;
+            }
+        } catch (e2) {
+            // Fallback: usa la larghezza dello schermo
+            return window.screen.width > 768;
+        }
+    }
+    // Default: usa la larghezza della finestra corrente
+    return window.innerWidth > 768;
+}
+
 function getLangText(key) {
     return messages[currentLang][key] || key;
 }
@@ -156,7 +177,7 @@ function showSubjectCounter() {
     counter.textContent = `${getLangText('selected')} ${count} ${getLangText('of')} 2`;
 
     // Scroll quando l'utente inizia a selezionare materie
-    if (selectedSubjects.length > 0) {
+    if (selectedSubjects.length > 0 && !isDesktop()) {
         scrollToBottom();
     }
 }
