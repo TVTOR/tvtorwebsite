@@ -209,7 +209,7 @@ body {
 
 #userInput:focus { border-color: #007bff; }
 
-#sendButton {
+.send-button, #sendButton, #sendButtonMateria, #sendButtonLocalita, #sendButtonPhone {
     padding: 20px 20px;
     background: #007bff;
     color: white;
@@ -221,8 +221,8 @@ body {
     font-size: 18px;
 }
 
-#sendButton:hover { background: #0056b3; }
-#sendButton:disabled { background: #ccc; cursor: not-allowed; }
+.send-button:hover, #sendButton:hover, #sendButtonMateria:hover, #sendButtonLocalita:hover, #sendButtonPhone:hover { background: #0056b3; }
+.send-button:disabled, #sendButton:disabled, #sendButtonMateria:disabled, #sendButtonLocalita:disabled, #sendButtonPhone:disabled { background: #ccc; cursor: not-allowed; }
 
 .subject-selection .options-container { max-height: 300px; overflow-y: auto; }
 
