@@ -16,7 +16,7 @@ let messageCount = 0;
 
 const messages = {
     it: {
-        welcome: "Ciao! 👋 In meno di 1 minuto troviamo un tutor giusto per Te gratuitamente. 🎓 Rispondi a 3 domande e il tutor assegnato ti contatterà entro 8 ore 👇",
+        welcome: "✅Rispondi alle seguenti 3 domande:\n\n1) 🕔 In 40 secondi un consulente ti invierà il profilo del tutor giusto per Te gratuitamente.\n2) 🎓 L'insegnante ti contatterà entro 8 ore 🤝"
         processing: "Grazie! Stiamo cercando il miglior tutor per te. Attendi per favore...",
         noTutor: "Non ci sono tutor disponibili al momento. Scrivici al +39 3485804824!",
         phoneQuestion: "📞 Inserisci il tuo numero di telefono per essere contattato dal tutor 🤝\n" +
@@ -33,7 +33,7 @@ const messages = {
         selectAtLeastOne: "Seleziona almeno una materia"
     },
     en: {
-        welcome: "Hi! 👋 In less than a minute, we'll find the right tutor for you for free. 🎓 Answer 3 questions and the assigned tutor will contact you within 8 hours 👇",
+        welcome: "✅Answer the following 3 questions:\n\n1) 🕔 Within 40 seconds, a consultant will send you the profile of the right tutor for you, completely free of charge.\n2) 🎓 The teacher will contact you within 8 hours 🤝"
         processing: "Thank you! We're finding the best tutor for you. Please wait...",
         noTutor: "No tutors are available right now. Contact us at +393485804824!",
         phoneQuestion: "📞 Enter your phone number to be contacted by the tutor 🤝\n" +
