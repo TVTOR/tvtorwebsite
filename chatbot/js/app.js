@@ -16,7 +16,7 @@ let messageCount = 0;
 
 const messages = {
     it: {
-        welcome: "✅Rispondi alle seguenti 3 domande:\n\n1) 🕔 In 40 secondi un consulente ti invierà il profilo del tutor giusto per Te gratuitamente.\n2) 🎓 L'insegnante ti contatterà entro 8 ore 🤝",
+        welcome: "✅ Rispondi alle seguenti 3 domande:<br><br>1) 🕔 In 40 secondi un consulente ti invierà il profilo del tutor giusto per Te gratuitamente.<br>2) 🎓 L'insegnante ti contatterà entro 8 ore 🤝",
         processing: "Grazie! Stiamo cercando il miglior tutor per te. Attendi per favore...",
         noTutor: "Non ci sono tutor disponibili al momento. Scrivici al +39 3485804824!",
         phoneQuestion: "📞 Inserisci il tuo numero di telefono per essere contattato dal tutor 🤝\n" +
@@ -33,7 +33,7 @@ const messages = {
         selectAtLeastOne: "Seleziona almeno una materia"
     },
     en: {
-        welcome: "✅Answer the following 3 questions:\n\n1) 🕔 Within 40 seconds, a consultant will send you the profile of the right tutor for you, completely free of charge.\n2) 🎓 The teacher will contact you within 8 hours 🤝",
+        welcome: "✅Answer the following 3 questions:<br><br>1) 🕔 Within 40 seconds, a consultant will send you the profile of the right tutor for you, completely free of charge.<br>2) 🎓 The teacher will contact you within 8 hours 🤝",
         processing: "Thank you! We're finding the best tutor for you. Please wait...",
         noTutor: "No tutors are available right now. Contact us at +393485804824!",
         phoneQuestion: "📞 Enter your phone number to be contacted by the tutor 🤝\n" +
@@ -57,7 +57,7 @@ function pushGtmEvent(eventName, params = {}) {
         window.dataLayer = window.dataLayer || [];
         const eventData = { event: eventName, ...params };
         window.dataLayer.push(eventData);
-        
+
         // Log colorato e dettagliato nella console
         console.log(
             '%c[GTM Event] %c' + eventName,
@@ -66,7 +66,7 @@ function pushGtmEvent(eventName, params = {}) {
             params
         );
         console.log('Full event data:', eventData);
-        
+
         return eventData;
     } catch (e) {
         console.error('[GTM] Failed to push event', eventName, e);
@@ -80,20 +80,20 @@ window.debugDataLayer = function(filterEvent = null) {
         console.log('⚠️ DataLayer is empty');
         return [];
     }
-    
+
     let events = window.dataLayer.filter(item => item.event);
-    
+
     if (filterEvent) {
         events = events.filter(item => item.event === filterEvent);
         console.log(`📊 Found ${events.length} event(s) with name "${filterEvent}":`);
     } else {
         console.log(`📊 Total events in dataLayer: ${events.length}`);
     }
-    
+
     events.forEach((item, index) => {
         console.log(`[${index + 1}] ${item.event}`, item);
     });
-    
+
     return events;
 };
 
@@ -964,13 +964,14 @@ window.addEventListener('load', function () {
         addTypingIndicator();
         setTimeout(() => {
             removeTypingIndicator();
-            addBotMessage(getLangText('welcome'), true); // skipScroll=true per il primo messaggio
+            addMessage(getLangText('welcome'), 'bot', true, true);
             setTimeout(() => {
                 fetchNextQuestion();
             }, 400);
         }, 800);
     }, 200);
 });
+
 function closeChatbot() {
     if (window.parent && window.parent !== window) {
         window.parent.postMessage({ action: 'closeChatbot' }, '*');

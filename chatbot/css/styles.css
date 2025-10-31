@@ -367,3 +367,7 @@ body {
         opacity: 1;
     }
 }
+
+.message-text {
+    white-space: pre-line;
+}
