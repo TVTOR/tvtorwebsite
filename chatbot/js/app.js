@@ -807,3 +807,13 @@ window.addEventListener('load', function () {
         }, 800);
     }, 200);
 });
+<script>
+    function closeChatbot() {
+    if (window.parent && window.parent !== window) {
+    window.parent.postMessage({ action: 'closeChatbot' }, '*');
+} else {
+    window.location.href = '../index.html';
+}
+}
+</script>
+

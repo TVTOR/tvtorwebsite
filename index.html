@@ -102,6 +102,11 @@
                 setTimeout(() => { if (!chatWidgetOpen) iframe.src = ''; }, 300);
                 chatWidgetOpen = false;
             }
+            window.addEventListener('message', (event) => {
+                if (event.data && event.data.action === 'closeChatbot') {
+                    closeChatWidget();
+                }
+            });
             document.addEventListener('keydown', function(event) {
                 if (event.key === 'Escape' && chatWidgetOpen) closeChatWidget();
             });
