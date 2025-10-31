@@ -51,6 +51,57 @@ const messages = {
     }
 };
 
+// --- GTM/GA4 helper ---
+function pushGtmEvent(eventName, params = {}) {
+    try {
+        window.dataLayer = window.dataLayer || [];
+        const eventData = { event: eventName, ...params };
+        window.dataLayer.push(eventData);
+        
+        // Log colorato e dettagliato nella console
+        console.log(
+            '%c[GTM Event] %c' + eventName,
+            'background: #4CAF50; color: white; padding: 2px 6px; border-radius: 3px; font-weight: bold;',
+            'color: #4CAF50; font-weight: bold;',
+            params
+        );
+        console.log('Full event data:', eventData);
+        
+        return eventData;
+    } catch (e) {
+        console.error('[GTM] Failed to push event', eventName, e);
+    }
+}
+
+// Debug helper: ispeziona il dataLayer dalla console
+// Usa: window.debugDataLayer() oppure window.debugDataLayer('event_name')
+window.debugDataLayer = function(filterEvent = null) {
+    if (!window.dataLayer || !window.dataLayer.length) {
+        console.log('⚠️ DataLayer is empty');
+        return [];
+    }
+    
+    let events = window.dataLayer.filter(item => item.event);
+    
+    if (filterEvent) {
+        events = events.filter(item => item.event === filterEvent);
+        console.log(`📊 Found ${events.length} event(s) with name "${filterEvent}":`);
+    } else {
+        console.log(`📊 Total events in dataLayer: ${events.length}`);
+    }
+    
+    events.forEach((item, index) => {
+        console.log(`[${index + 1}] ${item.event}`, item);
+    });
+    
+    return events;
+};
+
+// Mostra tutti gli eventi chatbot nella console
+window.debugChatbotEvents = function() {
+    return window.debugDataLayer().filter(e => e.event && e.event.startsWith('chatbot_'));
+};
+
 function isDesktop() {
     try {
         // Prova a leggere la larghezza della finestra parent (se in iframe)
@@ -150,19 +201,65 @@ function removeTypingAndLoading() {
 
 function disableInput() {
     const input = document.getElementById('userInput');
-    const btn = document.getElementById('sendButton');
+    const btn = getSendButton();
     input.disabled = true;
-    btn.disabled = true;
+    if (btn) btn.disabled = true;
+}
+
+function getSendButton() {
+    return document.querySelector('.send-button');
+}
+
+function updateSendButtonId(questionType) {
+    const btn = getSendButton();
+    if (!btn) return;
+
+    // Usa lastQuestionTitle se questionType non è fornito o è vuoto
+    let type = questionType || lastQuestionTitle;
+
+    // Normalizza il tipo convertendo a stringa e lowercase per il confronto
+    if (type) {
+        type = String(type).toLowerCase().trim();
+    }
+
+    // Debug log (rimuovere in produzione se necessario)
+    console.log('updateSendButtonId called with:', { questionType, lastQuestionTitle, type });
+
+    // Mappa i tipi riconosciuti → id
+    const typeToIdMap = {
+        subject: 'sendButtonMateria',
+        materia: 'sendButtonMateria',
+        materie: 'sendButtonMateria',
+        location: 'sendButtonLocalita',
+        'località': 'sendButtonLocalita',
+        localita: 'sendButtonLocalita',
+        luogo: 'sendButtonLocalita',
+        phone_number: 'sendButtonPhone',
+        phone: 'sendButtonPhone',
+        telefono: 'sendButtonPhone',
+        numero: 'sendButtonPhone',
+        mobilenumber: 'sendButtonPhone'
+    };
+
+    const newId = type ? typeToIdMap[type] : undefined;
+
+    // Applica l'id solo se riconosciuto; non resettare a default
+    if (newId) {
+        btn.id = newId;
+        console.log('Button ID updated to:', btn.id);
+    } else {
+        console.log('Button ID left unchanged');
+    }
 }
 
 function enableSendButton() {
-    const btn = document.getElementById('sendButton');
-    btn.disabled = false;
+    const btn = getSendButton();
+    if (btn) btn.disabled = false;
 }
 
 function disableSendButton() {
-    const btn = document.getElementById('sendButton');
-    btn.disabled = true;
+    const btn = getSendButton();
+    if (btn) btn.disabled = true;
 }
 
 function showSubjectCounter() {
@@ -229,10 +326,15 @@ function enableTextInput(questionName) {
     lastQuestionTitle = questionName || lastQuestionTitle;
 
     const userInput = document.getElementById('userInput');
-    const sendButton = document.getElementById('sendButton');
+    const sendButton = getSendButton();
 
     userInput.disabled = false;
-    sendButton.disabled = false;
+    if (sendButton) {
+        sendButton.disabled = false;
+        // Aggiorna l'id del pulsante in base al tipo di domanda
+        // Usa questionName se fornito, altrimenti usa lastQuestionTitle
+        updateSendButtonId(questionName || lastQuestionTitle);
+    }
     setTimeout(() => userInput.focus(), 50);
 
     if (questionName === 'age') {
@@ -245,8 +347,11 @@ function enableTextInput(questionName) {
 }
 
 function enableInputFor(q) {
-    if (q.type === 'text') enableTextInput(q.title || '');
-    else disableInput();
+    if (q.type === 'text') {
+        enableTextInput(q.title || '');
+    } else {
+        disableInput();
+    }
 }
 
 function applyPlaceholderHints(qData) {
@@ -288,6 +393,11 @@ function addOptions(options, {multiple = false, name = ''} = {}) {
                 if (isFetching) return;
                 addUserMessage(btn.textContent);
                 userData[name] = btn.dataset.value;
+                // GTM: single-select option chosen (e.g., location)
+                pushGtmEvent('chatbot_option_selected', {
+                    step: name || 'unknown',
+                    value: btn.dataset.value
+                });
                 wrap.remove();
 
                 if (userData.age && userData.subject && userData.location) {
@@ -329,6 +439,12 @@ function addOptions(options, {multiple = false, name = ''} = {}) {
 
                 if (selectedSubjects.length > 0) {
                     enableSendButton();
+                    // Aggiorna l'id per la selezione materia
+                    updateSendButtonId('subject');
+                    // GTM: multi-select subject – emit current selection snapshot
+                    pushGtmEvent('chatbot_subject_selection_changed', {
+                        selected: [...selectedSubjects]
+                    });
                 } else {
                     disableSendButton();
                 }
@@ -364,6 +480,10 @@ async function handleTextSubmit() {
         }
 
         userData.subject = selectedSubjects;
+        // GTM: subjects submitted
+        pushGtmEvent('chatbot_subjects_submitted', {
+            subjects: [...selectedSubjects]
+        });
         addUserMessage(selectedSubjects.map(s => {
             const btn = document.querySelector(`.option-button[data-value="${s}"]`);
             return btn ? btn.textContent : s;
@@ -392,7 +512,14 @@ async function handleTextSubmit() {
         userData[lastQuestionTitle] = val;
     }
 
+    // GTM: age submitted (when pressing invio after writing school year)
+    if (lastQuestionTitle === 'age') {
+        pushGtmEvent('chatbot_age_submitted', { age: val });
+    }
+
     if (lastQuestionTitle === 'phone_number') {
+        // GTM: phone submitted
+        pushGtmEvent('chatbot_phone_submitted');
         sendToFormspree(userData, val);
         input.value = '';
         endConversationUI();
@@ -402,6 +529,12 @@ async function handleTextSubmit() {
     input.value = '';
 
     if (userData.age && userData.subject && userData.location) {
+        // GTM: all basic info collected – starting tutor search
+        pushGtmEvent('chatbot_info_complete', {
+            age: userData.age || null,
+            subjects: Array.isArray(userData.subject) ? userData.subject : [userData.subject],
+            location: userData.location || null
+        });
         startTutorSearch();
         return;
     }
@@ -467,7 +600,8 @@ async function fetchNextQuestion() {
         removeTypingIndicator();
 
         if (!qData.length) {
-            enableTextInput();
+            // Se non ci sono dati, mantieni lastQuestionTitle e aggiorna l'id
+            enableTextInput(lastQuestionTitle);
             isFetching = false;
             return;
         }
@@ -511,6 +645,10 @@ function renderQuestion(qData) {
     if (q.type === 'select') {
         const multiple = (q.title === 'subject');
         addOptions(q.options || [], {multiple, name: q.title});
+        // Aggiorna l'id del pulsante anche per selezioni singole (es. location)
+        if (!multiple) {
+            updateSendButtonId(q.title);
+        }
     } else {
         enableTextInput(q.title || '');
     }
@@ -673,6 +811,13 @@ function assignTutor() {
                 `;
                 addMessage(tutorHTML, 'bot', true);
 
+                // GTM: tutor assigned
+                pushGtmEvent('chatbot_tutor_assigned', {
+                    tutor_name: tutor.name || '',
+                    tutor_email: tutor.email || '',
+                    tutor_mobile: tutor.mobileNumber || ''
+                });
+
                 sendNotification('tutor_assigned');
 
                 setTimeout(() => {
@@ -684,7 +829,7 @@ function assignTutor() {
                             lastQuestionTitle = 'phone_number';
                             const input = document.getElementById('userInput');
                             input.placeholder = currentLang === 'it' ? 'Inserisci il tuo numero' : 'Enter your phone number';
-                            enableTextInput();
+                            enableTextInput('phone_number');
                         }, 200);
                     }, 800);
                 }, 300);
@@ -709,15 +854,17 @@ function assignTutor() {
 
 function endRequestUI(placeholderText) {
     const input = document.getElementById('userInput');
-    const btn = document.getElementById('sendButton');
+    const btn = getSendButton();
     input.disabled = true;
-    btn.disabled = true;
+    if (btn) {
+        btn.disabled = true;
+        btn.style.backgroundColor = '#ccc';
+        btn.style.cursor = 'not-allowed';
+    }
     input.placeholder = placeholderText || getLangText('conversationEnded');
     input.style.backgroundColor = '#f5f5f5';
     input.style.color = '#888';
     input.style.cursor = 'not-allowed';
-    btn.style.backgroundColor = '#ccc';
-    btn.style.cursor = 'not-allowed';
 }
 
 function endConversationUI() {
@@ -757,7 +904,20 @@ function sendToFormspree(userData, phoneNumber) {
     });
 }
 
-document.getElementById('sendButton').addEventListener('click', handleTextSubmit);
+// Assicurati che l'event listener venga aggiunto quando il DOM è pronto
+const sendBtn = getSendButton();
+if (sendBtn) {
+    sendBtn.addEventListener('click', handleTextSubmit);
+} else {
+    // Se il pulsante non è ancora disponibile, aggiungi l'event listener dopo il caricamento
+    window.addEventListener('load', function() {
+        const btn = getSendButton();
+        if (btn && !btn.hasAttribute('data-listener-attached')) {
+            btn.setAttribute('data-listener-attached', 'true');
+            btn.addEventListener('click', handleTextSubmit);
+        }
+    });
+}
 document.getElementById('userInput').addEventListener('keypress', function (e) {
     if (e.key === 'Enter') {
         e.preventDefault();
@@ -767,7 +927,11 @@ document.getElementById('userInput').addEventListener('keypress', function (e) {
 
 document.getElementById('languageChange').addEventListener('change', function () {
     currentLang = this.value;
-    document.getElementById('sendButton').textContent = getLangText('send');
+    const sendBtn = getSendButton();
+    if (sendBtn) sendBtn.textContent = getLangText('send');
+
+    // GTM: language changed
+    pushGtmEvent('chatbot_language_changed', { language: currentLang });
 
     const firstMessage = document.querySelector('.message.bot');
     if (firstMessage && document.querySelectorAll('.message').length === 1) {
