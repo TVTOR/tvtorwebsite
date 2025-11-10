@@ -59,7 +59,7 @@ const messages = {
 function pushGtmEvent(eventName, params = {}) {
     try {
         window.dataLayer = window.dataLayer || [];
-        const eventData = { event: eventName, ...params };
+        const eventData = {event: eventName, ...params};
         window.dataLayer.push(eventData);
 
         // Log colorato e dettagliato nella console
@@ -79,7 +79,7 @@ function pushGtmEvent(eventName, params = {}) {
 
 // Debug helper: ispeziona il dataLayer dalla console
 // Usa: window.debugDataLayer() oppure window.debugDataLayer('event_name')
-window.debugDataLayer = function(filterEvent = null) {
+window.debugDataLayer = function (filterEvent = null) {
     if (!window.dataLayer || !window.dataLayer.length) {
         console.log('⚠️ DataLayer is empty');
         return [];
@@ -102,7 +102,7 @@ window.debugDataLayer = function(filterEvent = null) {
 };
 
 // Mostra tutti gli eventi chatbot nella console
-window.debugChatbotEvents = function() {
+window.debugChatbotEvents = function () {
     return window.debugDataLayer().filter(e => e.event && e.event.startsWith('chatbot_'));
 };
 
@@ -227,7 +227,7 @@ function updateSendButtonId(questionType) {
     }
 
     // Debug log (rimuovere in produzione se necessario)
-    console.log('updateSendButtonId called with:', { questionType, lastQuestionTitle, type });
+    console.log('updateSendButtonId called with:', {questionType, lastQuestionTitle, type});
 
     // Mappa i tipi riconosciuti → id
     const typeToIdMap = {
@@ -284,8 +284,6 @@ function showSubjectCounter() {
 }
 
 
-
-
 let errorTimeout = null;
 
 function showErrorMessage(message) {
@@ -309,7 +307,7 @@ function showErrorMessage(message) {
     void errorMsg.offsetHeight;
 
     setTimeout(() => {
-        errorMsg.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        errorMsg.scrollIntoView({behavior: 'smooth', block: 'center'});
     }, 100);
 
     errorTimeout = setTimeout(() => {
@@ -322,8 +320,6 @@ function showErrorMessage(message) {
         }, 300);
     }, 1000);
 }
-
-
 
 
 function enableTextInput(questionName) {
@@ -471,8 +467,6 @@ function addOptions(options, {multiple = false, name = ''} = {}) {
 }
 
 
-
-
 async function handleTextSubmit() {
     if (isFetching) return;
 
@@ -518,7 +512,7 @@ async function handleTextSubmit() {
 
     // GTM: age submitted (when pressing invio after writing school year)
     if (lastQuestionTitle === 'age') {
-        pushGtmEvent('chatbot_age_submitted', { age: val });
+        pushGtmEvent('chatbot_age_submitted', {age: val});
     }
 
     if (lastQuestionTitle === 'phone_number') {
@@ -807,6 +801,7 @@ function assignTutor() {
                     notificationId = result.data.notificationId;
                 }
 
+                // Scheda del tutor
                 const tutorHTML = `
                     <div class="tutor-card">
                         ${tutor.imageUrl ? `<img src="${tutor.imageUrl}" alt="${tutor.name}">` : ''}
@@ -814,6 +809,40 @@ function assignTutor() {
                     </div>
                 `;
                 addMessage(tutorHTML, 'bot', true);
+
+                // ✅ Bubble "Contattalo su WhatsApp" con controllo sicuro del numero
+                // Supporta: stringhe, numeri, o valori mancanti
+                const rawMobile = tutor.mobileNumber ?? userData.tutor_mobile ?? '';
+                const cleanedMobile = String(rawMobile).replace(/\D/g, ''); // sempre safe perché String(...)
+                if (cleanedMobile && cleanedMobile.length >= 5) { // semplice validazione minimale
+                    const whatsappUrl = `https://wa.me/${cleanedMobile}`;
+                    const whatsappBubble = `
+                        <a href="${whatsappUrl}" target="_blank" rel="noopener noreferrer" style="text-decoration: none;">
+                            <div style="
+                                display: inline-flex;
+                                align-items: center;
+                                background-color: #25D366;
+                                color: white;
+                                border-radius: 25px;
+                                padding: 10px 16px;
+                                font-weight: 500;
+                                cursor: pointer;
+                                font-family: Arial, sans-serif;
+                                margin-top: 10px;
+                                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                            ">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg"
+                                     alt="WhatsApp"
+                                     style="width: 20px; height: 20px; margin-right: 8px;">
+                                <span>Contattalo su WhatsApp</span>
+                            </div>
+                        </a>
+                    `;
+                    addMessage(whatsappBubble, 'bot', true);
+                } else {
+                    // opzionale: log se non c'è numero valido
+                    console.log('AssignTutor: no valid mobile number to create WhatsApp link', rawMobile);
+                }
 
                 // GTM: tutor assigned
                 pushGtmEvent('chatbot_tutor_assigned', {
@@ -824,6 +853,7 @@ function assignTutor() {
 
                 sendNotification('tutor_assigned');
 
+                // Prossimo step: chiedi numero telefono
                 setTimeout(() => {
                     addTypingIndicator();
                     setTimeout(() => {
@@ -832,7 +862,9 @@ function assignTutor() {
                         setTimeout(() => {
                             lastQuestionTitle = 'phone_number';
                             const input = document.getElementById('userInput');
-                            input.placeholder = currentLang === 'it' ? 'Inserisci il tuo numero' : 'Enter your phone number';
+                            input.placeholder = currentLang === 'it'
+                                ? 'Inserisci il tuo numero'
+                                : 'Enter your phone number';
                             enableTextInput('phone_number');
                         }, 200);
                     }, 800);
@@ -840,7 +872,9 @@ function assignTutor() {
 
             } else {
                 addBotMessage(getLangText('noTutor'));
-                endRequestUI(currentLang === 'it' ? 'Nessun tutor disponibile' : 'No tutor available');
+                endRequestUI(currentLang === 'it'
+                    ? 'Nessun tutor disponibile'
+                    : 'No tutor available');
             }
         },
         error: function (err) {
@@ -849,10 +883,13 @@ function assignTutor() {
             clearInterval(setIntervalTime);
             removeTypingAndLoading();
             addBotMessage(getLangText('noTutor'));
-            endRequestUI(currentLang === 'it' ? 'Nessun tutor disponibile' : 'No tutor available');
+            endRequestUI(currentLang === 'it'
+                ? 'Nessun tutor disponibile'
+                : 'No tutor available');
         }
     });
 }
+
 
 
 
@@ -914,7 +951,7 @@ if (sendBtn) {
     sendBtn.addEventListener('click', handleTextSubmit);
 } else {
     // Se il pulsante non è ancora disponibile, aggiungi l'event listener dopo il caricamento
-    window.addEventListener('load', function() {
+    window.addEventListener('load', function () {
         const btn = getSendButton();
         if (btn && !btn.hasAttribute('data-listener-attached')) {
             btn.setAttribute('data-listener-attached', 'true');
@@ -935,7 +972,7 @@ document.getElementById('languageChange').addEventListener('change', function ()
     if (sendBtn) sendBtn.textContent = getLangText('send');
 
     // GTM: language changed
-    pushGtmEvent('chatbot_language_changed', { language: currentLang });
+    pushGtmEvent('chatbot_language_changed', {language: currentLang});
 
     const firstMessage = document.querySelector('.message.bot');
     if (firstMessage && document.querySelectorAll('.message').length === 1) {
@@ -978,7 +1015,7 @@ window.addEventListener('load', function () {
 
 function closeChatbot() {
     if (window.parent && window.parent !== window) {
-        window.parent.postMessage({ action: 'closeChatbot' }, '*');
+        window.parent.postMessage({action: 'closeChatbot'}, '*');
     } else {
         window.location.href = '../index.html';
     }
