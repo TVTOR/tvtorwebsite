@@ -17,10 +17,11 @@ let messageCount = 0;
 const messages = {
     it: {
         welcome: "1 ) ✅ Rispondi alle 3 domande in questa chat.<br>" +
-            "2 ) 🕔 In 40 secondi un consulente invierà il profilo del tutor adatto a Te, gratuitamente.<br>" +
+            "2 ) 🕔 In 50 secondi un consulente invierà il profilo del tutor adatto a Te, gratuitamente.<br>" +
             "3 ) 🎓 L'insegnante ti contatterà entro 8 ore.",
         processing: "Grazie! Stiamo cercando il miglior tutor per te. Attendi per favore...",
-        noTutor: "Non ci sono tutor disponibili al momento. Scrivici al +39 3485804824!",
+        noTutor: "Riprova in un altro momento, oppure chiama la persona che gestisce i tutor al 3485804824.<br><br>Clicca qui sotto per contattarci su WhatsApp ⬇️",
+        contactOnWhatsapp: "Contattaci su WhatsApp",
         phoneQuestion: "📞 Inserisci il tuo numero di telefono per essere contattato dal tutor 🤝\n" +
             "🔒 Il numero verrà inviato all'insegnante e poi cancellato automaticamente ✅",
         contactMessage: "Il numero di telefono del tutor è: {phone}\nBuona lezione!",
@@ -36,10 +37,11 @@ const messages = {
     },
     en: {
         welcome: "1 ) ✅ Answer the 3 questions in this chat.<br>" +
-            "2 ) 🕔 Within 40 seconds, a consultant will send you the profile of the most suitable tutor, free of charge.<br>" +
+            "2 ) 🕔 Within 50 seconds, a consultant will send you the profile of the most suitable tutor, free of charge.<br>" +
             "3 ) 🎓 The teacher will contact you within 8 hours.",
         processing: "Thank you! We're finding the best tutor for you. Please wait...",
-        noTutor: "No tutors are available right now. Contact us at +393485804824!",
+        noTutor: "Please try again later, or call the person who manages tutors at 3485804824.<br><br>Click below to contact us on WhatsApp ⬇️",
+        contactOnWhatsapp: "Contact us on WhatsApp",
         phoneQuestion: "📞 Enter your phone number to be contacted by the tutor 🤝\n" +
             "🔒 The number will be sent to the teacher and then automatically deleted ✅",
         contactMessage: "The tutor's phone number is: {phone}\nHave a nice lesson!",
@@ -166,6 +168,35 @@ function addBotMessage(text, skipScroll = false) {
 
 function addUserMessage(text) {
     return addMessage(text, 'user', false);
+}
+
+function addNoTutorMessage() {
+    const whatsappUrl = 'https://wa.me/393485804824';
+    addMessage(getLangText('noTutor'), 'bot', true);
+
+    const whatsappBubble = `
+        <a href="${whatsappUrl}" target="_blank" rel="noopener noreferrer" style="text-decoration: none;">
+            <div style="
+                display: inline-flex;
+                align-items: center;
+                background-color: #25D366;
+                color: white;
+                border-radius: 25px;
+                padding: 10px 16px;
+                font-weight: 500;
+                cursor: pointer;
+                font-family: Arial, sans-serif;
+                margin-top: 10px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            ">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg"
+                     alt="WhatsApp"
+                     style="width: 20px; height: 20px; margin-right: 8px;">
+                <span>${getLangText('contactOnWhatsapp')}</span>
+            </div>
+        </a>
+    `;
+    return addMessage(whatsappBubble, 'bot', true);
 }
 
 function addTypingIndicator() {
@@ -752,15 +783,15 @@ function startTutorSearch() {
     }, 250);
 
     setTimeout(function () {
-        console.log('30s timeout reached. isAssignTutor:', isAssignTutor);
+        console.log('50s timeout reached. isAssignTutor:', isAssignTutor);
         clearInterval(setIntervalTime);
         if (isAssignTutor) {
             isAssignTutor = false;
             removeTypingAndLoading();
-            addBotMessage(getLangText('noTutor'));
+            addNoTutorMessage();
             endRequestUI(currentLang === 'it' ? 'Richiesta inviata' : 'Request sent');
         }
-    }, 30000);
+    }, 50000);
 }
 
 function checkTutorAssignOrNot() {
@@ -825,12 +856,9 @@ function assignTutor() {
                     </div>
                 `;
                 addMessage(tutorHTML, 'bot', true);
-
-                // ✅ Bubble "Contattalo su WhatsApp" con controllo sicuro del numero
-                // Supporta: stringhe, numeri, o valori mancanti
                 const rawMobile = tutor.mobileNumber ?? userData.tutor_mobile ?? '';
-                const cleanedMobile = String(rawMobile).replace(/\D/g, ''); // sempre safe perché String(...)
-                if (cleanedMobile && cleanedMobile.length >= 5) { // semplice validazione minimale
+                const cleanedMobile = String(rawMobile).replace(/\D/g, '');
+                if (cleanedMobile && cleanedMobile.length >= 5) {
                     const whatsappUrl = `https://wa.me/${cleanedMobile}`;
                     const whatsappBubble = `
                         <a href="${whatsappUrl}" target="_blank" rel="noopener noreferrer" style="text-decoration: none;">
@@ -856,7 +884,6 @@ function assignTutor() {
                     `;
                     addMessage(whatsappBubble, 'bot', true);
                 } else {
-                    // opzionale: log se non c'è numero valido
                     console.log('AssignTutor: no valid mobile number to create WhatsApp link', rawMobile);
                 }
 
@@ -887,7 +914,7 @@ function assignTutor() {
                 }, 300);
 
             } else {
-                addBotMessage(getLangText('noTutor'));
+                addNoTutorMessage();
                 endRequestUI(currentLang === 'it'
                     ? 'Nessun tutor disponibile'
                     : 'No tutor available');
@@ -898,7 +925,7 @@ function assignTutor() {
             isAssignTutor = false;
             clearInterval(setIntervalTime);
             removeTypingAndLoading();
-            addBotMessage(getLangText('noTutor'));
+            addNoTutorMessage();
             endRequestUI(currentLang === 'it'
                 ? 'Nessun tutor disponibile'
                 : 'No tutor available');
