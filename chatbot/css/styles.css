@@ -194,6 +194,27 @@ body {
     margin: 0;
 }
 
+@media (min-width: 769px) {
+    .tutor-card {
+        flex-direction: row;
+        align-items: flex-start;
+        gap: 16px;
+        text-align: left;
+    }
+
+    .tutor-card img {
+        width: 180px;
+        height: 120px;
+        border-radius: 12px;
+        margin: 0;
+        flex-shrink: 0;
+    }
+
+    .tutor-card p {
+        flex: 1;
+    }
+}
+
 .input-container {
     padding: 15px;
     border-top: 1px solid #ddd;
@@ -321,6 +342,13 @@ body {
 
     .tutor-card p {
         font-size: 16px;
+    }
+
+    .tutor-card img {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        margin: 0 auto 10px;
     }
 }
 
